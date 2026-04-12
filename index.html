@@ -60,6 +60,14 @@
       text-decoration: none; transition: background 0.2s;
     }
     .nav-cta:hover { background: var(--gold2) !important; }
+    .nav-dashboard {
+      display: flex; align-items: center; gap: 0.4rem;
+      font-size: 0.75rem; color: rgba(245,242,238,0.35);
+      text-decoration: none; border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 100px; padding: 0.35rem 0.85rem;
+      transition: color 0.2s, border-color 0.2s, background 0.2s;
+    }
+    .nav-dashboard:hover { color: var(--gold2); border-color: rgba(196,150,61,0.3); background: rgba(196,150,61,0.05); }
 
     /* ─── HERO ─── */
     .hero {
@@ -347,7 +355,11 @@
   <a href="#" class="nav-logo">Faith<span>Drive</span></a>
   <a href="#product" class="nav-link">Product</a>
   <a href="#verhaal" class="nav-link">Verhaal</a>
-  <a href="#bestellen" class="nav-cta">Voorinschrijven</a>
+  <a href="#bestellen" class="nav-link">Voorinschrijven</a>
+  <a href="login.html" class="nav-dashboard" title="Intern dashboard">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+    Dashboard
+  </a>
 </nav>
 
 <!-- HERO -->
@@ -449,7 +461,7 @@
 <!-- FOOTER -->
 <footer>
   <div class="footer-brand">Faith<span>Drive</span></div>
-  <p>© 2025 FaithDrive. Alle rechten voorbehouden.</p>
+  <p>© 2026 FaithDrive. Alle rechten voorbehouden.</p>
   <nav>
     <a href="#" class="nav-link">Privacy</a>
   </nav>
