@@ -1,0 +1,1138 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FaithDrive — Intern Dashboard</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%231a1a1a'/%3E%3Ctext x='16' y='22' font-size='18' text-anchor='middle' fill='%23C4963D'%3E✦%3C/text%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --black: #0D0D0D;
+      --dark:  #141414;
+      --card:  #1A1A1A;
+      --card2: #1F1F1F;
+      --border: rgba(255,255,255,0.06);
+      --gold:  #C4963D;
+      --gold2: #E8B458;
+      --white: #F5F2EE;
+      --muted: rgba(245,242,238,0.38);
+      --green: #4CAF7D;
+      --red:   #E05A5A;
+      --blue:  #5A9BE0;
+    }
+    html { height: 100%; }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--black);
+      color: var(--white);
+      height: 100%;
+      display: flex;
+      overflow: hidden;
+    }
+
+    /* ─── SIDEBAR ─── */
+    .sidebar {
+      width: 240px;
+      min-width: 240px;
+      background: var(--dark);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      position: sticky;
+      top: 0;
+    }
+    .sidebar-brand {
+      padding: 1.5rem 1.5rem 1.25rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .sidebar-logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.3rem; font-weight: 600;
+      color: var(--white); letter-spacing: 0.04em;
+    }
+    .sidebar-logo span { color: var(--gold); font-weight: 300; }
+    .sidebar-tag {
+      font-size: 0.6rem; letter-spacing: 0.16em;
+      text-transform: uppercase; color: var(--muted);
+      margin-top: 3px;
+    }
+    .sidebar-nav {
+      flex: 1;
+      padding: 1rem 0.75rem;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      overflow-y: auto;
+    }
+    .nav-section-label {
+      font-size: 0.58rem; letter-spacing: 0.18em;
+      text-transform: uppercase; color: rgba(245,242,238,0.2);
+      padding: 0.75rem 0.75rem 0.4rem;
+      margin-top: 0.5rem;
+    }
+    .nav-item {
+      display: flex; align-items: center; gap: 0.75rem;
+      padding: 0.6rem 0.75rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+      font-size: 0.83rem;
+      color: var(--muted);
+      user-select: none;
+    }
+    .nav-item:hover { background: rgba(255,255,255,0.04); color: var(--white); }
+    .nav-item.active {
+      background: rgba(196,150,61,0.1);
+      color: var(--gold2);
+      border: 1px solid rgba(196,150,61,0.15);
+    }
+    .nav-item svg { flex-shrink: 0; opacity: 0.7; }
+    .nav-item.active svg { opacity: 1; }
+    .nav-badge {
+      margin-left: auto;
+      background: var(--gold);
+      color: #000;
+      font-size: 0.58rem;
+      font-weight: 700;
+      padding: 0.15rem 0.45rem;
+      border-radius: 100px;
+    }
+    .sidebar-footer {
+      padding: 1rem 1.5rem;
+      border-top: 1px solid var(--border);
+      font-size: 0.7rem;
+      color: rgba(245,242,238,0.18);
+    }
+
+    /* ─── MAIN CONTENT ─── */
+    .main {
+      flex: 1;
+      overflow-y: auto;
+      height: 100vh;
+    }
+    .topbar {
+      position: sticky; top: 0;
+      background: rgba(13,13,13,0.9);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 0.9rem 2rem;
+      display: flex; align-items: center; justify-content: space-between;
+      z-index: 10;
+    }
+    .topbar-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.1rem; font-weight: 400;
+    }
+    .topbar-title em { font-style: italic; color: var(--gold2); }
+    .topbar-right {
+      display: flex; align-items: center; gap: 1rem;
+      font-size: 0.75rem; color: var(--muted);
+    }
+    .status-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--green);
+      display: inline-block; margin-right: 0.3rem;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%,100% { opacity: 1; } 50% { opacity: 0.4; }
+    }
+
+    /* ─── PAGES ─── */
+    .page { display: none; padding: 2rem; animation: fadeIn 0.25s ease; }
+    .page.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* ─── CARDS ─── */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+    }
+    .card-gold {
+      border-color: rgba(196,150,61,0.2);
+      background: rgba(196,150,61,0.04);
+    }
+
+    /* ─── GRID HELPERS ─── */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
+
+    /* ─── PAGE HEADER ─── */
+    .page-header { margin-bottom: 2rem; }
+    .page-label {
+      font-size: 0.62rem; letter-spacing: 0.2em;
+      text-transform: uppercase; color: var(--gold2);
+      display: flex; align-items: center; gap: 0.6rem;
+      margin-bottom: 0.5rem;
+    }
+    .page-label::before { content: ''; width: 20px; height: 1px; background: var(--gold2); opacity: 0.4; }
+    .page-header h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2rem; font-weight: 300;
+    }
+    .page-header h1 em { font-style: italic; color: var(--gold2); }
+    .page-header p { font-size: 0.82rem; color: var(--muted); margin-top: 0.4rem; }
+
+    /* ─── STAT CARDS ─── */
+    .stat-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+    }
+    .stat-label { font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.6rem; }
+    .stat-value {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2rem; font-weight: 300; color: var(--white); line-height: 1;
+    }
+    .stat-value.gold { color: var(--gold2); }
+    .stat-sub { font-size: 0.72rem; color: var(--muted); margin-top: 0.4rem; }
+    .stat-change { font-size: 0.72rem; margin-top: 0.3rem; }
+    .stat-change.up { color: var(--green); }
+    .stat-change.down { color: var(--red); }
+
+    /* ─── SECTION TITLE ─── */
+    .section-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.1rem; font-weight: 400;
+      color: var(--white); margin-bottom: 1rem;
+    }
+    .section-title em { font-style: italic; color: var(--gold2); }
+
+    /* ─── STAP ITEMS ─── */
+    .stap-group { margin-bottom: 2rem; }
+    .stap-group-title {
+      font-size: 0.65rem; letter-spacing: 0.18em;
+      text-transform: uppercase; color: var(--gold2);
+      margin-bottom: 0.75rem; padding-bottom: 0.5rem;
+      border-bottom: 1px solid rgba(196,150,61,0.15);
+      display: flex; align-items: center; gap: 0.5rem;
+    }
+    .stap {
+      display: flex; gap: 1rem;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1rem 1.25rem;
+      margin-bottom: 0.6rem;
+      transition: border-color 0.2s;
+    }
+    .stap:hover { border-color: rgba(196,150,61,0.2); }
+    .stap-num {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.3rem; font-weight: 300;
+      color: var(--gold2); min-width: 28px; line-height: 1.2;
+    }
+    .stap-body h4 { font-size: 0.85rem; font-weight: 600; color: var(--white); margin-bottom: 0.3rem; }
+    .stap-body p { font-size: 0.78rem; color: var(--muted); line-height: 1.6; }
+    .stap.warning { border-color: rgba(224,90,90,0.25); background: rgba(224,90,90,0.04); }
+    .stap.warning .stap-num { color: var(--red); }
+    .stap.tip { border-color: rgba(76,175,125,0.2); background: rgba(76,175,125,0.03); }
+    .stap.tip .stap-num { color: var(--green); }
+
+    /* ─── SOCIAL GRID ─── */
+    .social-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      display: flex; flex-direction: column;
+      gap: 0.75rem;
+      transition: border-color 0.2s, transform 0.2s;
+      cursor: pointer; text-decoration: none;
+    }
+    .social-card:hover { border-color: rgba(196,150,61,0.25); transform: translateY(-3px); }
+    .social-icon {
+      width: 44px; height: 44px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem;
+    }
+    .social-card h3 { font-size: 0.9rem; font-weight: 600; color: var(--white); }
+    .social-card p { font-size: 0.75rem; color: var(--muted); line-height: 1.5; }
+    .social-link {
+      font-size: 0.7rem; color: var(--gold2); letter-spacing: 0.06em;
+      display: flex; align-items: center; gap: 0.3rem;
+      margin-top: auto;
+    }
+
+    /* Content idee tags */
+    .tag {
+      display: inline-block;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 100px;
+      padding: 0.2rem 0.65rem;
+      font-size: 0.68rem;
+      color: var(--muted);
+      margin: 0.2rem;
+    }
+    .tag.gold { background: rgba(196,150,61,0.1); border-color: rgba(196,150,61,0.2); color: var(--gold2); }
+
+    /* ─── CONTENT IDEAS ─── */
+    .idea-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.1rem 1.25rem;
+      margin-bottom: 0.6rem;
+      display: flex; gap: 1rem; align-items: flex-start;
+    }
+    .idea-platform {
+      font-size: 1.2rem; flex-shrink: 0;
+      width: 36px; height: 36px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .idea-body h4 { font-size: 0.82rem; font-weight: 600; color: var(--white); margin-bottom: 0.25rem; }
+    .idea-body p { font-size: 0.75rem; color: var(--muted); line-height: 1.5; }
+
+    /* ─── MOMENT CALENDAR ─── */
+    .moment-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.1rem 1.25rem;
+      display: flex; gap: 1.25rem; align-items: center;
+    }
+    .moment-date {
+      text-align: center; min-width: 52px;
+      background: rgba(196,150,61,0.08);
+      border: 1px solid rgba(196,150,61,0.15);
+      border-radius: 8px;
+      padding: 0.5rem 0.4rem;
+    }
+    .moment-month { font-size: 0.55rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gold2); }
+    .moment-day { font-family: 'Cormorant Garamond', serif; font-size: 1.6rem; font-weight: 300; color: var(--white); line-height: 1; }
+    .moment-body h4 { font-size: 0.85rem; font-weight: 600; color: var(--white); margin-bottom: 0.2rem; }
+    .moment-body p { font-size: 0.75rem; color: var(--muted); }
+    .moment-badge {
+      margin-left: auto; flex-shrink: 0;
+      font-size: 0.62rem; letter-spacing: 0.08em;
+      text-transform: uppercase; padding: 0.2rem 0.55rem;
+      border-radius: 100px;
+    }
+    .badge-high { background: rgba(196,150,61,0.15); color: var(--gold2); border: 1px solid rgba(196,150,61,0.2); }
+    .badge-med  { background: rgba(90,155,224,0.12); color: var(--blue); border: 1px solid rgba(90,155,224,0.2); }
+
+    /* ─── DOELGROEP ─── */
+    .persona {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+    }
+    .persona-header {
+      display: flex; align-items: center; gap: 1rem; margin-bottom: 1.25rem;
+    }
+    .persona-avatar {
+      width: 48px; height: 48px; border-radius: 50%;
+      background: rgba(196,150,61,0.12);
+      border: 1px solid rgba(196,150,61,0.2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem;
+    }
+    .persona-name { font-size: 0.9rem; font-weight: 600; color: var(--white); }
+    .persona-desc { font-size: 0.72rem; color: var(--muted); }
+    .persona-tags { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-bottom: 1rem; }
+    .persona-row { display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0; border-bottom: 1px solid var(--border); }
+    .persona-row:last-child { border-bottom: none; }
+    .persona-row span:first-child { font-size: 0.72rem; color: var(--muted); }
+    .persona-row span:last-child { font-size: 0.78rem; color: var(--white); font-weight: 500; }
+    .bar-wrap { display: flex; align-items: center; gap: 0.75rem; }
+    .bar { height: 5px; background: rgba(255,255,255,0.06); border-radius: 100px; overflow: hidden; }
+    .bar-fill { height: 100%; background: var(--gold); border-radius: 100px; }
+
+    /* ─── VERKOOP ─── */
+    .order-row {
+      display: flex; align-items: center; gap: 1rem;
+      padding: 0.9rem 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.82rem;
+    }
+    .order-row:last-child { border-bottom: none; }
+    .order-status {
+      font-size: 0.65rem; letter-spacing: 0.08em;
+      text-transform: uppercase; padding: 0.2rem 0.6rem;
+      border-radius: 100px;
+    }
+    .status-paid { background: rgba(76,175,125,0.12); color: var(--green); border: 1px solid rgba(76,175,125,0.2); }
+    .status-pending { background: rgba(196,150,61,0.1); color: var(--gold2); border: 1px solid rgba(196,150,61,0.2); }
+    .status-shipped { background: rgba(90,155,224,0.1); color: var(--blue); border: 1px solid rgba(90,155,224,0.2); }
+    .order-amount { margin-left: auto; font-weight: 600; color: var(--white); }
+
+    /* ─── CHECKLIST ─── */
+    .check-item {
+      display: flex; align-items: flex-start; gap: 0.75rem;
+      padding: 0.75rem 0;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+    }
+    .check-item:last-child { border-bottom: none; }
+    .check-box {
+      width: 18px; height: 18px; flex-shrink: 0;
+      border: 1.5px solid rgba(255,255,255,0.15);
+      border-radius: 4px; margin-top: 1px;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.15s;
+    }
+    .check-item.done .check-box {
+      background: var(--gold); border-color: var(--gold);
+    }
+    .check-item.done .check-text { color: var(--muted); text-decoration: line-through; }
+    .check-text { font-size: 0.82rem; color: var(--white); line-height: 1.4; }
+    .check-sub { font-size: 0.72rem; color: var(--muted); margin-top: 0.2rem; }
+
+    /* ─── PROGRESS ─── */
+    .progress-wrap { margin-top: 0.5rem; }
+    .progress-bar {
+      height: 6px; background: rgba(255,255,255,0.06);
+      border-radius: 100px; overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%; background: linear-gradient(90deg, var(--gold), var(--gold2));
+      border-radius: 100px;
+      transition: width 0.6s ease;
+    }
+    .progress-label {
+      display: flex; justify-content: space-between;
+      font-size: 0.68rem; color: var(--muted);
+      margin-bottom: 0.4rem;
+    }
+
+    /* ─── MOBILE ─── */
+    @media (max-width: 768px) {
+      .sidebar { display: none; }
+      .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <div class="sidebar-logo">Faith<span>Drive</span></div>
+    <div class="sidebar-tag">Intern Dashboard</div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">Overzicht</div>
+    <div class="nav-item active" onclick="showPage('dashboard', this)">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      Dashboard
+    </div>
+    <div class="nav-item" onclick="showPage('checklist', this)">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+      Lanceer Checklist
+      <span class="nav-badge">12</span>
+    </div>
+
+    <div class="nav-section-label">Product</div>
+    <div class="nav-item" onclick="showPage('stappenplan', this)">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      Stappenplan
+    </div>
+    <div class="nav-item" onclick="showPage('verkoop', this)">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+      Verkoop
+    </div>
+
+    <div class="nav-section-label">Marketing</div>
+    <div class="nav-item" onclick="showPage('socials', this)">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+      Socials
+    </div>
+    <div class="nav-item" onclick="showPage('doelgroep', this)">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+      Doelgroep
+    </div>
+    <div class="nav-item" onclick="showPage('kalender', this)">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      Bijzondere Momenten
+    </div>
+  </nav>
+  <div class="sidebar-footer">FaithDrive · Intern gebruik</div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+  <div class="topbar">
+    <div class="topbar-title" id="topbar-title">Goed<em>morgen</em></div>
+    <div class="topbar-right">
+      <span><span class="status-dot"></span>Live</span>
+      <span id="current-date"></span>
+    </div>
+  </div>
+
+  <!-- ═══ DASHBOARD ═══ -->
+  <div class="page active" id="page-dashboard">
+    <div class="page-header">
+      <div class="page-label">Overzicht</div>
+      <h1>Faith<em>Drive</em> Dashboard</h1>
+      <p>Jouw centrale plek voor alles rondom het product.</p>
+    </div>
+
+    <div class="grid-4" style="margin-bottom:1.5rem;">
+      <div class="stat-card">
+        <div class="stat-label">Verkopen</div>
+        <div class="stat-value gold">0</div>
+        <div class="stat-sub">Nog niet gelanceerd</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Voorinschrijvingen</div>
+        <div class="stat-value">—</div>
+        <div class="stat-sub">Lanceer de site eerst</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Inkoopprijs/stuk</div>
+        <div class="stat-value gold">€5</div>
+        <div class="stat-sub">Incl. verpakking</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Streefprijs</div>
+        <div class="stat-value gold">€29</div>
+        <div class="stat-sub">Marge ~€24 per stuk</div>
+      </div>
+    </div>
+
+    <div class="grid-2" style="margin-bottom:1.5rem;">
+      <!-- Lanceer voortgang -->
+      <div class="card">
+        <div class="section-title">Lanceer<em>voortgang</em></div>
+        <div style="margin-bottom:1.25rem;">
+          <div class="progress-label"><span>Fase 1 — Productie & Sample</span><span id="prog-pct">0%</span></div>
+          <div class="progress-bar"><div class="progress-fill" id="prog-bar" style="width:0%"></div></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:0.5rem;">
+          <div style="display:flex;justify-content:space-between;font-size:0.78rem;color:var(--muted);padding:0.4rem 0;border-bottom:1px solid var(--border);">
+            <span>Sample besteld</span><span id="s1" style="color:var(--muted);">○</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:0.78rem;color:var(--muted);padding:0.4rem 0;border-bottom:1px solid var(--border);">
+            <span>Sample goedgekeurd</span><span id="s2" style="color:var(--muted);">○</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:0.78rem;color:var(--muted);padding:0.4rem 0;border-bottom:1px solid var(--border);">
+            <span>Verpakking ontworpen</span><span id="s3" style="color:var(--muted);">○</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:0.78rem;color:var(--muted);padding:0.4rem 0;border-bottom:1px solid var(--border);">
+            <span>Productie order geplaatst</span><span id="s4" style="color:var(--muted);">○</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:0.78rem;color:var(--muted);padding:0.4rem 0;">
+            <span>Website live</span><span id="s5" style="color:var(--muted);">○</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Volgende actie -->
+      <div style="display:flex;flex-direction:column;gap:1.25rem;">
+        <div class="card card-gold">
+          <div class="stat-label">Volgende actie</div>
+          <div style="font-size:0.9rem;font-weight:600;color:var(--white);margin:0.5rem 0 0.25rem;">Bestel je eerste sample</div>
+          <div style="font-size:0.78rem;color:var(--muted);line-height:1.6;">Ga naar Alibaba, zoek op "seat belt cover embroidery" en vraag 3 samples aan bij verschillende leveranciers.</div>
+        </div>
+        <div class="card">
+          <div class="stat-label">Eerste grote moment</div>
+          <div style="font-size:0.9rem;font-weight:600;color:var(--white);margin:0.5rem 0 0.25rem;">🌙 Ramadan 2026</div>
+          <div style="font-size:0.78rem;color:var(--muted);">Start marketing minimaal 8 weken voor Ramadan. Dit is het grootste verkoopmoment van het jaar.</div>
+        </div>
+        <div class="card">
+          <div class="stat-label">Prijs inschatting bij 100 stuks</div>
+          <div style="font-size:1.4rem;font-family:'Cormorant Garamond',serif;color:var(--gold2);margin:0.4rem 0 0.2rem;">€2.400 omzet</div>
+          <div style="font-size:0.75rem;color:var(--muted);">100 × €29 − €700 kosten = ~€1.700 winst</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ CHECKLIST ═══ -->
+  <div class="page" id="page-checklist">
+    <div class="page-header">
+      <div class="page-label">Actie</div>
+      <h1>Lanceer<em>checklist</em></h1>
+      <p>Klik een taak aan als deze klaar is.</p>
+    </div>
+    <div class="grid-2">
+      <div>
+        <div class="stap-group-title">🏭 Productie</div>
+        <div class="card" style="padding:0.25rem 1rem;">
+          <div class="check-item" onclick="toggleCheck(this)">
+            <div class="check-box"><svg width="10" height="10" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="#000" stroke-width="2" stroke-linecap="round"/></svg></div>
+            <div><div class="check-text">Product Specification Sheet opstellen</div><div class="check-sub">Materiaal, kleuren (Pantone), afmetingen, borduurdichtheid</div></div>
+          </div>
+          <div class="check-item" onclick="toggleCheck(this)">
+            <div class="check-box"><svg width="10" height="10" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="#000" stroke-width="2" stroke-linecap="round"/></svg></div>
+            <div><div class="check-text">Arabische tekst laten verifiëren</div><div class="check-sub">Door native speaker of islamitisch geleerde</div></div>
+          </div>
+          <div class="check-item" onclick="toggleCheck(this)">
+            <div class="check-box"><svg width="10" height="10" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="#000" stroke-width="2" stroke-linecap="round"/></svg></div>
+            <div><div class="check-text">3 leveranciers vergelijken op Alibaba</div><div class="check-sub">Min. verified, 4.8+ rating, ervaring met borduurwerk</div></div>
+          </div>
+          <div class="check-item" onclick="toggleCheck(this)">
+            <div class="check-box"><svg width="10" height="10" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="#000" stroke-width="2" stroke-linecap="round"/></svg></div>
+            <div><div class="check-text">3 fysieke samples bestellen</div><div class="check-sub">Nooit alleen op foto's goedkeuren</div></div>
+          </div>
+          <div class="check-item" onclick="toggleCheck(this)">
+            <div class="check-box"><svg width="10" height="10" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="#000" stroke-width="2" stroke-linecap="round"/></svg></div>
+            <div><div class="check-text">Sample goedgekeurd en schriftelijk vastgelegd</div><div class="check-sub">Contract met leverancier met exacte specificaties</div></div>
+          </div>
+          <div class="check-item" onclick="toggleCheck(this)">
+            <div class="check-box"><svg width="10" height="10" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="#000" stroke-width="2" stroke-linecap="round"/></svg></div>
+            <div><div class="check-text">Eerste order geplaatst (100–150 stuks)</div><div class="check-sub">Klein starten, markt testen</div></div>
+          </div>
+          <div class="check-item" onclick="toggleCheck(this)">
+            <div class="check-box"><svg width="10" height="10" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="#000" stroke-width="2" stroke-linecap="round"/></svg></div>
+            <div><div class="check-text">QC inspectie geboekt (QIMA/AsiaInspection)</div><div class="check-sub">Vóór verzending, max 2.5% defecten AQL</div></div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="stap-group-title">📦 Verpakking & Shipping</div>
+        <div class="card" style="padding:0.25rem 1rem;">
+          <div class="check-item" onclick="toggleCheck(this)">
+            <div class="check-box"><svg width="10" height="10" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="#000" stroke-width="2" stroke-linecap="round"/></svg></div>
+            <div><div class="check-text">Verpakking ontworpen (matte zwarte doos)</div><div class="check-sub">Met goudfolie logo, inlegkaart, tissue paper</div></div>
+          </div>
+          <div class="check-item" onclick="toggleCheck(this)">
+            <div class="check-box"><svg width="10" height="10" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="#000" stroke-width="2" stroke-linecap="round"/></svg></div>
+            <div><div class="check-text">Freight forwarder geregeld</div><div class="check-sub">Shypple, Flexport of vergelijkbaar — DDP optie</div></div>
+          </div>
+          <div class="check-item" onclick="toggleCheck(this)">
+            <div class="check-box"><svg width="10" height="10" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="#000" stroke-width="2" stroke-linecap="round"/></svg></div>
+            <div><div class="check-text">Importbelasting en BTW ingecalculeerd</div><div class="check-sub">~21% BTW + eventuele invoerrechten</div></div>
+          </div>
+          <div class="check-item" onclick="toggleCheck(this)">
+            <div class="check-box"><svg width="10" height="10" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="#000" stroke-width="2" stroke-linecap="round"/></svg></div>
+            <div><div class="check-text">KvK inschrijving geregeld</div></div>
+          </div>
+          <div class="check-item" onclick="toggleCheck(this)">
+            <div class="check-box"><svg width="10" height="10" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="#000" stroke-width="2" stroke-linecap="round"/></svg></div>
+            <div><div class="check-text">Webshop / betaallink ingericht</div><div class="check-sub">Shopify, WooCommerce of Stripe direct</div></div>
+          </div>
+        </div>
+
+        <div class="stap-group-title" style="margin-top:1.5rem;">📱 Marketing</div>
+        <div class="card" style="padding:0.25rem 1rem;">
+          <div class="check-item" onclick="toggleCheck(this)">
+            <div class="check-box"><svg width="10" height="10" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="#000" stroke-width="2" stroke-linecap="round"/></svg></div>
+            <div><div class="check-text">Instagram account aangemaakt (@faithdrive.nl)</div></div>
+          </div>
+          <div class="check-item" onclick="toggleCheck(this)">
+            <div class="check-box"><svg width="10" height="10" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="#000" stroke-width="2" stroke-linecap="round"/></svg></div>
+            <div><div class="check-text">TikTok account aangemaakt</div></div>
+          </div>
+          <div class="check-item" onclick="toggleCheck(this)">
+            <div class="check-box"><svg width="10" height="10" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="#000" stroke-width="2" stroke-linecap="round"/></svg></div>
+            <div><div class="check-text">Unboxing video opgenomen van sample</div><div class="check-sub">Dit is je eerste content stuk — doe het goed</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ STAPPENPLAN ═══ -->
+  <div class="page" id="page-stappenplan">
+    <div class="page-header">
+      <div class="page-label">Gids</div>
+      <h1>Stappen<em>plan</em></h1>
+      <p>Van idee naar product in handen van de klant — inclusief valkuilen.</p>
+    </div>
+
+    <div class="stap-group">
+      <div class="stap-group-title">🏭 Stap 1 — Kwaliteit vastleggen</div>
+      <div class="stap">
+        <div class="stap-num">1.1</div>
+        <div class="stap-body"><h4>Product Specification Sheet</h4><p>Leg alles schriftelijk vast: materiaalsoort, dikte fluweel, Pantone kleurcode, borduurdichtheid, afmetingen (lengte, breedte), stikselvolgorde en verpakkingsvereisten. Dit is het contract met je leverancier.</p></div>
+      </div>
+      <div class="stap">
+        <div class="stap-num">1.2</div>
+        <div class="stap-body"><h4>Arabische tekst 100% verifiëren</h4><p>Laat de tekst controleren door een native Arabic speaker of een vertrouwde islamitisch geleerde — niet door Google Translate. Fouten in Arabische tekst vallen direct op en kunnen je reputatie schaden.</p></div>
+      </div>
+      <div class="stap">
+        <div class="stap-num">1.3</div>
+        <div class="stap-body"><h4>3 fysieke samples bestellen</h4><p>Altijd meerdere samples aanvragen, ook bij dezelfde leverancier. Voel het materiaal, controleer de borduurdichtheid, trek aan de naden. Vergelijk ze naast elkaar.</p></div>
+      </div>
+      <div class="stap warning">
+        <div class="stap-num">❌</div>
+        <div class="stap-body"><h4>Valkuil: alleen foto's goedkeuren</h4><p>Foto's zeggen niets over hoe het materiaal aanvoelt of hoe stevig het borduurwerk zit. Nooit akkoord gaan zonder fysiek sample.</p></div>
+      </div>
+    </div>
+
+    <div class="stap-group">
+      <div class="stap-group-title">🔍 Stap 2 — De juiste leverancier</div>
+      <div class="stap">
+        <div class="stap-num">2.1</div>
+        <div class="stap-body"><h4>Zoeken op Alibaba of 1688.com</h4><p>Zoekterm: "seat belt cover embroidery" of "car seat belt shoulder pad velvet". Filter op: Verified Supplier, Trade Assurance, min. 4.8 ster, actief 3+ jaar.</p></div>
+      </div>
+      <div class="stap">
+        <div class="stap-num">2.2</div>
+        <div class="stap-body"><h4>Minimaal 3 leveranciers vergelijken</h4><p>Vraag elk dezelfde specificaties aan. Vergelijk prijs, MOQ (minimale ordergrootte), levertijd, sampletijd en communicatiesnelheid.</p></div>
+      </div>
+      <div class="stap">
+        <div class="stap-num">2.3</div>
+        <div class="stap-body"><h4>Begin klein: 100–150 stuks</h4><p>Eerste order klein houden. Test de markt, verzamel reviews, optimaliseer je product — schaal daarna pas op naar 500 of 1000 stuks.</p></div>
+      </div>
+      <div class="stap warning">
+        <div class="stap-num">❌</div>
+        <div class="stap-body"><h4>Valkuil: de goedkoopste kiezen</h4><p>Dit is een geloofsproduct — mensen hebben er hoge verwachtingen van. Slechte kwaliteit = slechte reviews = dood voor je merk. Kies de beste prijs/kwaliteitsverhouding, niet de laagste prijs.</p></div>
+      </div>
+    </div>
+
+    <div class="stap-group">
+      <div class="stap-group-title">🔎 Stap 3 — Kwaliteitscontrole (QC)</div>
+      <div class="stap">
+        <div class="stap-num">3.1</div>
+        <div class="stap-body"><h4>Third-party QC inspectie boeken</h4><p>Gebruik QIMA (qima.com) of Bureau Veritas voor een inspectie vóór verzending. Kost ~€200–300 maar bespaart duizenden bij een slechte batch.</p></div>
+      </div>
+      <div class="stap">
+        <div class="stap-num">3.2</div>
+        <div class="stap-body"><h4>AQL instellen op 2.5%</h4><p>AQL (Acceptable Quality Level) van 2.5% = max 2.5% defecten in de batch is acceptabel. Leg dit vast in je contract. Bij meer defecten: naleveringsverplichting of terugbetaling.</p></div>
+      </div>
+      <div class="stap tip">
+        <div class="stap-num">✓</div>
+        <div class="stap-body"><h4>Eerste paar dozen zelf openbreken</h4><p>Als de order aankomt, open je de eerste 10–15 dozen zelf. Steekproef. Kijk of het overeenkomt met het goedgekeurde sample.</p></div>
+      </div>
+    </div>
+
+    <div class="stap-group">
+      <div class="stap-group-title">📦 Stap 4 — Verpakking (hier zit de luxe)</div>
+      <div class="stap">
+        <div class="stap-num">4.1</div>
+        <div class="stap-body"><h4>Matte zwarte geschenkdoos met goudfolie</h4><p>Het product zit in een auto — mensen kopen het ook als cadeau voor Eid, geboorte, afstuderen. Een mooie doos rechtvaardigt een prijs van €29–35 in plaats van €10.</p></div>
+      </div>
+      <div class="stap">
+        <div class="stap-num">4.2</div>
+        <div class="stap-body"><h4>Inlegkaartje met betekenis</h4><p>Een kaartje met de betekenis van de Arabische tekst in het Nederlands én Arabisch. Dit maakt het persoonlijk en versterkt de emotionele waarde van het product.</p></div>
+      </div>
+      <div class="stap">
+        <div class="stap-num">4.3</div>
+        <div class="stap-body"><h4>Unboxing = je marketing</h4><p>Mensen filmen unboxings. Zorg dat het de moeite waard is: tissue paper, subtiele rozengeur of musk zakje, lint of magneetslot. Dit levert gratis TikTok/Instagram content op.</p></div>
+      </div>
+    </div>
+
+    <div class="stap-group">
+      <div class="stap-group-title">🚢 Stap 5 — Shipping & Invoer</div>
+      <div class="stap">
+        <div class="stap-num">5.1</div>
+        <div class="stap-body"><h4>Eerste orders via Air Freight</h4><p>Voor 100–500 stuks: luchtvrachtvervoer via een freight forwarder zoals Shypple.nl. Duurt 7–14 dagen, middelmatige kosten, regelt ook douane.</p></div>
+      </div>
+      <div class="stap">
+        <div class="stap-num">5.2</div>
+        <div class="stap-body"><h4>Kies DDP (Delivered Duty Paid)</h4><p>DDP = leverancier of forwarder regelt alles inclusief douane en importbelasting. Geen verrassingen bij aankomst. Makkelijkst voor beginners.</p></div>
+      </div>
+      <div class="stap warning">
+        <div class="stap-num">❌</div>
+        <div class="stap-body"><h4>Valkuil: BTW en invoerrechten vergeten</h4><p>Reken altijd ~21% BTW + eventuele invoerrechten mee in je kostprijs. Dit vergeten is een van de meest gemaakte fouten bij eerste import.</p></div>
+      </div>
+    </div>
+
+    <div class="stap-group">
+      <div class="stap-group-title">💰 Stap 6 — Prijsstrategie</div>
+      <div class="stap">
+        <div class="stap-num">6.1</div>
+        <div class="stap-body"><h4>Kostprijsberekening per stuk</h4><p>Inkoop China: €3–5 · Verpakking: €1–2 · Shipping + douane: €1–2 · Totale kostprijs: ~€6–9. Verkoopprijs: €25–35 (3–5x marge). Marge is nodig voor retouren, marketing en opschalen.</p></div>
+      </div>
+      <div class="stap tip">
+        <div class="stap-num">✓</div>
+        <div class="stap-body"><h4>Cadeau-bundel als upsell</h4><p>2 stuks voor €49 (in een dubbele doos) of een giftset met rozengeur. Hogere orderwaarde, makkelijkere winstmarge.</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ SOCIALS ═══ -->
+  <div class="page" id="page-socials">
+    <div class="page-header">
+      <div class="page-label">Marketing</div>
+      <h1>Social <em>Media</em></h1>
+      <p>Platforms, content ideeën en strategie voor FaithDrive.</p>
+    </div>
+
+    <div class="grid-3" style="margin-bottom:2rem;">
+      <a href="https://instagram.com" target="_blank" class="social-card">
+        <div class="social-icon" style="background:linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);">📸</div>
+        <h3>Instagram</h3>
+        <p>Visueel platform — perfect voor productfoto's, lifestyle shots en Reels. Kern van je merk-uitstraling.</p>
+        <div style="display:flex;flex-wrap:wrap;gap:0.3rem;margin-top:0.25rem;">
+          <span class="tag gold">Reels</span>
+          <span class="tag">Productfoto's</span>
+          <span class="tag">Stories</span>
+        </div>
+        <div class="social-link">Naar Instagram →</div>
+      </a>
+      <a href="https://tiktok.com" target="_blank" class="social-card">
+        <div class="social-icon" style="background:#010101;">🎵</div>
+        <h3>TikTok</h3>
+        <p>Viraal platform — unboxings en "why I bought this" video's gaan hier enorm goed in de moslimcommunity.</p>
+        <div style="display:flex;flex-wrap:wrap;gap:0.3rem;margin-top:0.25rem;">
+          <span class="tag gold">Unboxing</span>
+          <span class="tag">Trending audio</span>
+          <span class="tag">POV video's</span>
+        </div>
+        <div class="social-link">Naar TikTok →</div>
+      </a>
+      <a href="https://wa.me" target="_blank" class="social-card">
+        <div class="social-icon" style="background:#25D366;">💬</div>
+        <h3>WhatsApp Broadcast</h3>
+        <p>Bouw een broadcast lijst op van geïnteresseerden. Directe, persoonlijke communicatie voor lanceringen en aanbiedingen.</p>
+        <div style="display:flex;flex-wrap:wrap;gap:0.3rem;margin-top:0.25rem;">
+          <span class="tag gold">Lancering alerts</span>
+          <span class="tag">Exclusief</span>
+        </div>
+        <div class="social-link">WhatsApp openen →</div>
+      </a>
+    </div>
+
+    <div class="section-title" style="margin-bottom:1rem;">Content<em>ideeën</em></div>
+    <div style="margin-bottom:2rem;">
+      <div class="idea-card">
+        <div class="idea-platform">📦</div>
+        <div class="idea-body">
+          <h4>Unboxing video — eerste sample</h4>
+          <p>Filmde de moment dat je het sample uitpakt. Authentiek, rauw, geen perfecte belichting nodig. Dit soort video's gaan viraal op TikTok.</p>
+          <div style="margin-top:0.5rem;"><span class="tag gold">TikTok</span><span class="tag">Instagram Reels</span><span class="tag">Hoge prioriteit</span></div>
+        </div>
+      </div>
+      <div class="idea-card">
+        <div class="idea-platform">🚗</div>
+        <div class="idea-body">
+          <h4>POV: Je stapt in je auto — Bismillah</h4>
+          <p>"POV: je stapt elke dag in je auto met barakah" — sluit af met het product in beeld. Gebruik trending nasheed audio.</p>
+          <div style="margin-top:0.5rem;"><span class="tag gold">TikTok</span><span class="tag">Reels</span></div>
+        </div>
+      </div>
+      <div class="idea-card">
+        <div class="idea-platform">🎁</div>
+        <div class="idea-body">
+          <h4>Cadeautip voor Eid</h4>
+          <p>"Weet je nog niet wat je iemand cadeau moet geven voor Eid? Dit is het meest betekenisvolle cadeautje dat ik ooit heb gegeven." — persoonlijk verhaal + product.</p>
+          <div style="margin-top:0.5rem;"><span class="tag gold">Instagram</span><span class="tag">TikTok</span><span class="tag">Seizoensgebonden</span></div>
+        </div>
+      </div>
+      <div class="idea-card">
+        <div class="idea-platform">✍️</div>
+        <div class="idea-body">
+          <h4>De betekenis uitleggen</h4>
+          <p>Leg in een korte video uit wat de tekst op het hoesje betekent en waarom je dit product hebt gemaakt. Verhaal = verbinding = vertrouwen.</p>
+          <div style="margin-top:0.5rem;"><span class="tag">Instagram</span><span class="tag">Verhaal</span></div>
+        </div>
+      </div>
+      <div class="idea-card">
+        <div class="idea-platform">👥</div>
+        <div class="idea-body">
+          <h4>Stuur naar 5 micro-influencers</h4>
+          <p>Moslim lifestyle creators met 5.000–50.000 volgers. Stuur een gratis product. Geen betaling nodig — authentieke creators doen dit graag als het product mooi is.</p>
+          <div style="margin-top:0.5rem;"><span class="tag gold">Influencer</span><span class="tag">Gratis product</span><span class="tag">High impact</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-title" style="margin-bottom:1rem;">Hashtag <em>strategie</em></div>
+    <div class="card">
+      <p style="font-size:0.78rem;color:var(--muted);margin-bottom:1rem;">Gebruik een mix van grote en niche hashtags per post:</p>
+      <div>
+        <div style="margin-bottom:0.75rem;"><span style="font-size:0.72rem;color:var(--muted);display:block;margin-bottom:0.4rem;">Groot (1M+)</span>
+          <span class="tag">#muslim</span><span class="tag">#islam</span><span class="tag">#muslimlifestyle</span><span class="tag">#Alhamdulillah</span>
+        </div>
+        <div style="margin-bottom:0.75rem;"><span style="font-size:0.72rem;color:var(--muted);display:block;margin-bottom:0.4rem;">Middel (100K–1M)</span>
+          <span class="tag gold">#muslimshop</span><span class="tag gold">#islamicgifts</span><span class="tag gold">#muslimcar</span><span class="tag gold">#eidgift</span>
+        </div>
+        <div><span style="font-size:0.72rem;color:var(--muted);display:block;margin-bottom:0.4rem;">Niche (eigen)</span>
+          <span class="tag">#faithdrive</span><span class="tag">#rijmetbarakah</span><span class="tag">#gordelhoesje</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ DOELGROEP ═══ -->
+  <div class="page" id="page-doelgroep">
+    <div class="page-header">
+      <div class="page-label">Strategie</div>
+      <h1>Doel<em>groep</em></h1>
+      <p>Wie zijn je klanten, wat drijft ze en hoe bereik je ze.</p>
+    </div>
+
+    <div class="grid-2" style="margin-bottom:1.5rem;">
+      <div class="persona">
+        <div class="persona-header">
+          <div class="persona-avatar">👩</div>
+          <div><div class="persona-name">Fatima, 24</div><div class="persona-desc">Student / jonge professional, Rotterdam</div></div>
+        </div>
+        <div class="persona-tags">
+          <span class="tag gold">TikTok actief</span><span class="tag">Cadeauzoeker</span><span class="tag">Lifestyle bewust</span>
+        </div>
+        <div class="persona-row"><span>Platform</span><span>TikTok, Instagram</span></div>
+        <div class="persona-row"><span>Koopt voor</span><span>Zichzelf + als cadeau voor vriendin</span></div>
+        <div class="persona-row"><span>Koopdrempel</span><span>€25–35 prima als het mooi is</span></div>
+        <div class="persona-row"><span>Trigger</span><span>Visueel product, betekenisvolle tekst</span></div>
+        <div class="persona-row"><span>Bereik via</span><span>TikTok Reels + Eid content</span></div>
+      </div>
+      <div class="persona">
+        <div class="persona-header">
+          <div class="persona-avatar">👨</div>
+          <div><div class="persona-name">Ahmed, 35</div><div class="persona-desc">Ondernemer / vader, Amsterdam</div></div>
+        </div>
+        <div class="persona-tags">
+          <span class="tag gold">Cadeau gever</span><span class="tag">Meerdere auto's</span><span class="tag">Kwaliteitsgericht</span>
+        </div>
+        <div class="persona-row"><span>Platform</span><span>Instagram, WhatsApp</span></div>
+        <div class="persona-row"><span>Koopt voor</span><span>Vrouw, ouders, collega's (Eid)</span></div>
+        <div class="persona-row"><span>Koopdrempel</span><span>€30–40 als het echt premium is</span></div>
+        <div class="persona-row"><span>Trigger</span><span>Kwaliteit, verpakking, cadeauwaarde</span></div>
+        <div class="persona-row"><span>Bereik via</span><span>Instagram + WhatsApp broadcast</span></div>
+      </div>
+    </div>
+
+    <div class="section-title" style="margin-bottom:1rem;">Aankoop<em>motivaties</em></div>
+    <div class="grid-3" style="margin-bottom:1.5rem;">
+      <div class="card">
+        <div style="font-size:1.5rem;margin-bottom:0.75rem;">🤲</div>
+        <h3 style="font-size:0.88rem;font-weight:600;margin-bottom:0.4rem;">Geloof & intentie</h3>
+        <p style="font-size:0.76rem;color:var(--muted);line-height:1.6;">Elke rit beginnen met Bismillah of een beschermende dua. Het product geeft een dagelijkse spirituele herinnering.</p>
+      </div>
+      <div class="card">
+        <div style="font-size:1.5rem;margin-bottom:0.75rem;">🎁</div>
+        <h3 style="font-size:0.88rem;font-weight:600;margin-bottom:0.4rem;">Cadeau met betekenis</h3>
+        <p style="font-size:0.76rem;color:var(--muted);line-height:1.6;">Perfect cadeau voor Eid, rijbewijs gehaald, nieuwe auto, geboorte of Ramadan. Uniek en persoonlijk.</p>
+      </div>
+      <div class="card">
+        <div style="font-size:1.5rem;margin-bottom:0.75rem;">✨</div>
+        <h3 style="font-size:0.88rem;font-weight:600;margin-bottom:0.4rem;">Esthetiek & trots</h3>
+        <p style="font-size:0.76rem;color:var(--muted);line-height:1.6;">Het product ziet er premium uit. Mensen zijn trots het te laten zien aan vrienden en familie in de auto.</p>
+      </div>
+    </div>
+
+    <div class="section-title" style="margin-bottom:1rem;">Markt<em>grootte</em></div>
+    <div class="card grid-4">
+      <div>
+        <div class="stat-label">Moslims NL</div>
+        <div class="stat-value gold" style="font-size:1.6rem;">1.1M</div>
+        <div class="stat-sub">Totale doelgroep</div>
+      </div>
+      <div>
+        <div class="stat-label">Auto-eigenaren (~60%)</div>
+        <div class="stat-value gold" style="font-size:1.6rem;">660K</div>
+        <div class="stat-sub">Directe markt</div>
+      </div>
+      <div>
+        <div class="stat-label">Realistisch bereik 1%</div>
+        <div class="stat-value gold" style="font-size:1.6rem;">6.600</div>
+        <div class="stat-sub">Potentiële klanten</div>
+      </div>
+      <div>
+        <div class="stat-label">Bij 6.600 × €29</div>
+        <div class="stat-value gold" style="font-size:1.6rem;">€191K</div>
+        <div class="stat-sub">Omzetpotentieel NL</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ KALENDER ═══ -->
+  <div class="page" id="page-kalender">
+    <div class="page-header">
+      <div class="page-label">Planning</div>
+      <h1>Bijzondere <em>Momenten</em></h1>
+      <p>De belangrijkste verkoopmomenten van het jaar — plan je marketing hier omheen.</p>
+    </div>
+
+    <div class="card card-gold" style="margin-bottom:1.5rem;padding:1.25rem 1.5rem;">
+      <div style="font-size:0.8rem;color:var(--gold2);font-weight:600;margin-bottom:0.4rem;">⚡ Gouden regel</div>
+      <div style="font-size:0.82rem;color:rgba(245,242,238,0.65);line-height:1.6;">Start je marketing minimaal <strong style="color:var(--white);">6–8 weken vóór</strong> elk groot islamitisch moment. Orders uit China hebben 3–6 weken levertijd — zorg dat je stock hebt.</div>
+    </div>
+
+    <div class="section-title" style="margin-bottom:1rem;">2025 — <em>Aankomend</em></div>
+    <div style="display:flex;flex-direction:column;gap:0.75rem;margin-bottom:2rem;">
+      <div class="moment-card">
+        <div class="moment-date"><div class="moment-month">Jun</div><div class="moment-day">6</div></div>
+        <div class="moment-body"><h4>Eid al-Adha 2025</h4><p>Offerfeest — groot cadeaumoment. Families bij elkaar, uitwisselen van geschenken.</p></div>
+        <div class="moment-badge badge-high">Hoog</div>
+      </div>
+      <div class="moment-card">
+        <div class="moment-date"><div class="moment-month">Sep</div><div class="moment-day">22</div></div>
+        <div class="moment-body"><h4>Islamitisch Nieuwjaar 1447</h4><p>Reflectiemoment — goed moment voor intentie-gerelateerde content.</p></div>
+        <div class="moment-badge badge-med">Middel</div>
+      </div>
+      <div class="moment-card">
+        <div class="moment-date"><div class="moment-month">Okt</div><div class="moment-day">~1</div></div>
+        <div class="moment-body"><h4>Mawlid al-Nabi 2025</h4><p>Geboortedag van de Profeet — spiritueel moment, organische content kans.</p></div>
+        <div class="moment-badge badge-med">Middel</div>
+      </div>
+    </div>
+
+    <div class="section-title" style="margin-bottom:1rem;">2026 — <em>Plan hierop</em></div>
+    <div style="display:flex;flex-direction:column;gap:0.75rem;margin-bottom:2rem;">
+      <div class="moment-card" style="border-color:rgba(196,150,61,0.3);background:rgba(196,150,61,0.04);">
+        <div class="moment-date" style="background:rgba(196,150,61,0.15);border-color:rgba(196,150,61,0.3);"><div class="moment-month">Feb</div><div class="moment-day">~17</div></div>
+        <div class="moment-body"><h4>🌙 Ramadan 2026 — GROOTSTE MOMENT</h4><p>Start marketing in <strong>december 2025</strong>. Heb je stock klaar in januari. Ramadan = het grootste verkoopseizoen voor islamitische producten.</p></div>
+        <div class="moment-badge badge-high">🔥 Kritiek</div>
+      </div>
+      <div class="moment-card">
+        <div class="moment-date"><div class="moment-month">Mar</div><div class="moment-day">~19</div></div>
+        <div class="moment-body"><h4>Eid al-Fitr 2026</h4><p>Suikerfeest na Ramadan — tweede grote cadeaumoment van het jaar. Mensen hebben geld en kopen geschenken.</p></div>
+        <div class="moment-badge badge-high">Hoog</div>
+      </div>
+      <div class="moment-card">
+        <div class="moment-date"><div class="moment-month">Mei</div><div class="moment-day">~26</div></div>
+        <div class="moment-body"><h4>Eid al-Adha 2026</h4><p>Offerfeest — plan aparte campagne. Families reizen veel in deze periode (rijden veel), zeer relevant voor dit product.</p></div>
+        <div class="moment-badge badge-high">Hoog</div>
+      </div>
+    </div>
+
+    <div class="section-title" style="margin-bottom:1rem;">Algemene <em>momenten</em></div>
+    <div style="display:flex;flex-direction:column;gap:0.75rem;">
+      <div class="moment-card">
+        <div class="moment-date"><div class="moment-month">Heel</div><div class="moment-day">Jr</div></div>
+        <div class="moment-body"><h4>Rijbewijs gehaald</h4><p>Evergreen cadeauidee — "Rijbewijs gehaald? Gun jezelf of je kind een mooie start." Werkt het hele jaar door.</p></div>
+        <div class="moment-badge badge-med">Evergreen</div>
+      </div>
+      <div class="moment-card">
+        <div class="moment-date"><div class="moment-month">Heel</div><div class="moment-day">Jr</div></div>
+        <div class="moment-body"><h4>Nieuwe auto</h4><p>"Nieuwe auto? Maak je eerste rit compleet." — Dealers en Facebook Marketplace autoadvertenties zijn potentieel voor samenwerkingen.</p></div>
+        <div class="moment-badge badge-med">Evergreen</div>
+      </div>
+      <div class="moment-card">
+        <div class="moment-date"><div class="moment-month">Heel</div><div class="moment-day">Jr</div></div>
+        <div class="moment-body"><h4>Geboorte cadeau</h4><p>Ouders die een baby verwachten rijden ook auto — een mooie beschermende dua in de auto bij de geboorte van een kind.</p></div>
+        <div class="moment-badge badge-med">Cadeau</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ VERKOOP ═══ -->
+  <div class="page" id="page-verkoop">
+    <div class="page-header">
+      <div class="page-label">Financieel</div>
+      <h1>Ver<em>koop</em></h1>
+      <p>Bijhouden van orders, omzet en kosten.</p>
+    </div>
+    <div class="grid-4" style="margin-bottom:1.5rem;">
+      <div class="stat-card">
+        <div class="stat-label">Totale omzet</div>
+        <div class="stat-value gold">€0</div>
+        <div class="stat-sub">Nog niet gelanceerd</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Aantal orders</div>
+        <div class="stat-value">0</div>
+        <div class="stat-sub">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Gem. orderwaarde</div>
+        <div class="stat-value">—</div>
+        <div class="stat-sub">Doel: €29+</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Winst</div>
+        <div class="stat-value gold">€0</div>
+        <div class="stat-sub">—</div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div>
+        <div class="section-title" style="margin-bottom:1rem;">Orders <em>overzicht</em></div>
+        <div class="card" style="padding:0.5rem 1.25rem;">
+          <div style="text-align:center;padding:2rem;color:var(--muted);font-size:0.82rem;">
+            <div style="font-size:2rem;margin-bottom:0.75rem;">📦</div>
+            Nog geen orders. Zodra je lanceert komen ze hier te staan.
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="section-title" style="margin-bottom:1rem;">Kosten<em>calculator</em></div>
+        <div class="card">
+          <div style="display:flex;flex-direction:column;gap:0.75rem;">
+            <div style="display:flex;justify-content:space-between;font-size:0.82rem;padding-bottom:0.6rem;border-bottom:1px solid var(--border);">
+              <span style="color:var(--muted);">Inkoop per stuk (China)</span><span>€4,00</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:0.82rem;padding-bottom:0.6rem;border-bottom:1px solid var(--border);">
+              <span style="color:var(--muted);">Verpakking per stuk</span><span>€1,50</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:0.82rem;padding-bottom:0.6rem;border-bottom:1px solid var(--border);">
+              <span style="color:var(--muted);">Shipping + douane per stuk</span><span>€1,50</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:0.82rem;padding-bottom:0.6rem;border-bottom:1px solid var(--border);">
+              <span style="color:var(--muted);">Verzending NL per order</span><span>€4,25</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:0.88rem;font-weight:600;padding-top:0.25rem;">
+              <span style="color:var(--muted);">Totale kostprijs</span><span style="color:var(--white);">~€11,25</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:0.88rem;font-weight:600;background:rgba(196,150,61,0.08);border:1px solid rgba(196,150,61,0.15);border-radius:8px;padding:0.75rem;">
+              <span style="color:var(--gold2);">Verkoopprijs €29 → winst</span><span style="color:var(--gold2);">~€17,75</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+  // Password guard
+  if (sessionStorage.getItem('tc_auth') !== 'ok') {
+    window.location.replace('login.html');
+  }
+
+  // Navigation
+  function showPage(id, el) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById('page-' + id).classList.add('active');
+    el.classList.add('active');
+
+    const titles = {
+      dashboard: 'Goed<em>morgen</em>',
+      checklist: 'Lanceer<em>checklist</em>',
+      stappenplan: 'Stappen<em>plan</em>',
+      socials: 'Social <em>media</em>',
+      doelgroep: 'Doel<em>groep</em>',
+      kalender: 'Bijzondere <em>Momenten</em>',
+      verkoop: 'Ver<em>koop</em>'
+    };
+    document.getElementById('topbar-title').innerHTML = titles[id] || id;
+  }
+
+  // Greeting based on time
+  const h = new Date().getHours();
+  const greet = h < 12 ? 'Goed<em>morgen</em>' : h < 18 ? 'Goed<em>middag</em>' : 'Goed<em>avond</em>';
+  document.getElementById('topbar-title').innerHTML = greet;
+
+  // Date
+  document.getElementById('current-date').textContent = new Date().toLocaleDateString('nl-NL', {weekday:'long', day:'numeric', month:'long'});
+
+  // Checklist toggle
+  function toggleCheck(el) {
+    el.classList.toggle('done');
+    updateProgress();
+  }
+
+  function updateProgress() {
+    const all = document.querySelectorAll('#page-checklist .check-item');
+    const done = document.querySelectorAll('#page-checklist .check-item.done');
+    const pct = Math.round((done.length / all.length) * 100);
+    document.getElementById('prog-pct').textContent = pct + '%';
+    document.getElementById('prog-bar').style.width = pct + '%';
+
+    // Update dashboard steps
+    const steps = ['s1','s2','s3','s4','s5'];
+    const checks = document.querySelectorAll('#page-checklist .check-item');
+    const doneMap = [
+      checks[3]?.classList.contains('done'),
+      checks[4]?.classList.contains('done'),
+      checks[7]?.classList.contains('done'),
+      checks[5]?.classList.contains('done'),
+      checks[9]?.classList.contains('done'),
+    ];
+    steps.forEach((id, i) => {
+      const el = document.getElementById(id);
+      if (el) el.innerHTML = doneMap[i] ? '<span style="color:var(--green);">✓</span>' : '○';
+    });
+  }
+</script>
+</body>
+</html>
