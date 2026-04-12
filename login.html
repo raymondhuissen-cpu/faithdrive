@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FaithDrive — Toegang</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%231a1a1a'/%3E%3Ctext x='16' y='22' font-size='18' text-anchor='middle' fill='%23C4963D'%3E%E2%9C%A6%3C/text%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: #0D0D0D;
+      min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden;
+    }
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background:
+        radial-gradient(ellipse at 20% 50%, rgba(196,150,61,0.06) 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 30%, rgba(196,150,61,0.04) 0%, transparent 50%);
+      pointer-events: none;
+    }
+    .login-card {
+      position: relative;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 18px;
+      padding: 3rem 3rem 2.5rem;
+      width: 100%; max-width: 380px; margin: 1.5rem;
+      box-shadow: 0 40px 80px rgba(0,0,0,0.5);
+      animation: fadeUp 0.55s cubic-bezier(0.32,0.72,0,1) both;
+    }
+    @keyframes fadeUp { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:translateY(0); } }
+    .login-card::before {
+      content: '';
+      position: absolute; top: 0; left: 10%; right: 10%; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(196,150,61,0.6) 40%, rgba(232,180,88,0.8) 50%, rgba(196,150,61,0.6) 60%, transparent);
+    }
+    .login-logo {
+      display: flex; flex-direction: column; align-items: center;
+      gap: 4px; margin-bottom: 2rem;
+    }
+    .login-logo svg { margin-bottom: 0.75rem; }
+    .login-logo-tender { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; font-weight: 600; color: #F5F2EE; letter-spacing: 0.05em; line-height: 1; }
+    .login-logo-drive { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; font-weight: 300; color: #C4963D; letter-spacing: 0.12em; line-height: 1; }
+    .login-tagline { font-size: 0.72rem; color: rgba(245,242,238,0.25); letter-spacing: 0.08em; margin-top: 0.5rem; }
+    .login-divider { width: 32px; height: 0.5px; background: rgba(196,150,61,0.3); margin: 0 auto 2rem; }
+    label { display: block; font-size: 0.68rem; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(245,242,238,0.35); margin-bottom: 0.6rem; }
+    .input-wrap { position: relative; margin-bottom: 1.25rem; }
+    input[type="password"] {
+      width: 100%; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px; padding: 0.8rem 2.8rem 0.8rem 1rem;
+      font-family: 'DM Sans', sans-serif; font-size: 0.95rem; color: #F5F2EE;
+      letter-spacing: 0.2em; outline: none; transition: border-color 0.2s;
+    }
+    input[type="password"]::placeholder { letter-spacing: 0.05em; color: rgba(245,242,238,0.2); }
+    input[type="password"]:focus { border-color: rgba(196,150,61,0.4); }
+    input[type="password"].error { border-color: rgba(200,60,60,0.5); animation: shake 0.35s ease; }
+    @keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-6px)} 40%{transform:translateX(6px)} 60%{transform:translateX(-4px)} 80%{transform:translateX(4px)} }
+    .toggle-pw { position: absolute; right: 0.9rem; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: rgba(245,242,238,0.25); padding: 0; display: flex; transition: color 0.2s; }
+    .toggle-pw:hover { color: rgba(245,242,238,0.55); }
+    .error-msg { font-size: 0.75rem; color: rgba(200,80,80,0.85); margin-top: -0.75rem; margin-bottom: 1rem; display: none; }
+    .error-msg.visible { display: block; }
+    button[type="submit"] {
+      width: 100%; background: #1C3A2E; border: 1px solid rgba(196,150,61,0.25);
+      border-radius: 100px; padding: 0.85rem;
+      font-family: 'DM Sans', sans-serif; font-size: 0.85rem; font-weight: 500;
+      color: rgba(245,242,238,0.88); cursor: pointer;
+      transition: background 0.2s, border-color 0.2s, transform 0.15s; letter-spacing: 0.04em;
+    }
+    button[type="submit"]:hover { background: #244B3B; border-color: rgba(196,150,61,0.45); transform: translateY(-1px); }
+    .login-footer { text-align: center; margin-top: 1.75rem; font-size: 0.68rem; color: rgba(245,242,238,0.15); }
+  </style>
+</head>
+<body>
+<div class="login-card">
+  <div class="login-logo">
+    <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+      <circle cx="18" cy="18" r="17" stroke="#C4963D" stroke-width="1.2" opacity="0.4"/>
+      <text x="18" y="24" font-size="16" text-anchor="middle" fill="#C4963D">✦</text>
+    </svg>
+    <div class="login-logo-tender">Faith</div>
+    <div class="login-logo-drive">Drive</div>
+    <div class="login-tagline">Intern dashboard</div>
+  </div>
+  <div class="login-divider"></div>
+  <form id="loginForm" onsubmit="checkPassword(event)">
+    <label for="pw">Toegangscode</label>
+    <div class="input-wrap">
+      <input type="password" id="pw" placeholder="Voer wachtwoord in" autocomplete="current-password" autofocus>
+      <button type="button" class="toggle-pw" onclick="toggleVisibility()" aria-label="Toon wachtwoord">
+        <svg id="eyeIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+        </svg>
+      </button>
+    </div>
+    <div class="error-msg" id="errorMsg">Onjuist wachtwoord. Probeer opnieuw.</div>
+    <button type="submit">Toegang →</button>
+  </form>
+  <div class="login-footer">FaithDrive · Intern gebruik</div>
+</div>
+<script>
+  if (sessionStorage.getItem('tc_auth') === 'ok') window.location.replace('tool.html');
+
+  function checkPassword(e) {
+    e.preventDefault();
+    const input = document.getElementById('pw');
+    const errorMsg = document.getElementById('errorMsg');
+    if (input.value === '34782222') {
+      sessionStorage.setItem('tc_auth', 'ok');
+      window.location.replace('tool.html');
+    } else {
+      input.classList.add('error');
+      errorMsg.classList.add('visible');
+      setTimeout(() => input.classList.remove('error'), 400);
+      input.value = ''; input.focus();
+    }
+  }
+
+  function toggleVisibility() {
+    const input = document.getElementById('pw');
+    const icon = document.getElementById('eyeIcon');
+    if (input.type === 'password') {
+      input.type = 'text';
+      icon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23" stroke-linecap="round"/>';
+    } else {
+      input.type = 'password';
+      icon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+    }
+  }
+</script>
+</body>
+</html>
