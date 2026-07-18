@@ -1,4 +1,5 @@
 import NewsFeed from "@/components/NewsFeed";
+import InstallButton from "@/components/InstallButton";
 
 export default function Home() {
   return (
@@ -15,6 +16,9 @@ export default function Home() {
             <p className="text-xs text-gray-500">
               Actueel nieuws uit de zorgsector
             </p>
+          </div>
+          <div className="ml-auto">
+            <InstallButton />
           </div>
         </div>
       </header>
