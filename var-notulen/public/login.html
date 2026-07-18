@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VAR Notulen — Inloggen</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="login-wrap">
+  <div class="login-card">
+    <div class="brand-badge">🎙</div>
+    <h1>VAR Notulen</h1>
+    <p class="muted">Opname &amp; transcriptie voor de Verpleegkundig Advies Raad</p>
+    <form id="loginForm">
+      <div class="field">
+        <label for="pw">Wachtwoord</label>
+        <input type="password" id="pw" autocomplete="current-password" autofocus required>
+      </div>
+      <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center;">Inloggen</button>
+      <div class="error-msg" id="errorMsg">Onjuist wachtwoord. Probeer opnieuw.</div>
+    </form>
+  </div>
+</div>
+<script>
+  (async () => {
+    const res = await fetch('/api/session');
+    const data = await res.json();
+    if (data.authenticated) window.location.replace('dashboard.html');
+  })();
+
+  document.getElementById('loginForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const pw = document.getElementById('pw').value;
+    const errorMsg = document.getElementById('errorMsg');
+    const res = await fetch('/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: pw }),
+    });
+    if (res.ok) {
+      window.location.replace('dashboard.html');
+    } else {
+      errorMsg.classList.add('visible');
+      document.getElementById('pw').value = '';
+      document.getElementById('pw').focus();
+    }
+  });
+</script>
+</body>
+</html>

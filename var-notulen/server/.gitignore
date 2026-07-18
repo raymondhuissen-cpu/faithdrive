@@ -1,0 +1,4 @@
+node_modules/
+.env
+data/meetings/*.json
+!data/meetings/.gitkeep

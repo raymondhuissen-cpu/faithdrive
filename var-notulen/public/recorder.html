@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VAR Notulen — Opname</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="app-shell">
+  <header class="app-header">
+    <a href="dashboard.html" class="brand">
+      <span class="brand-badge">🎙</span>
+      <span>VAR Notulen<small>Bravis ziekenhuis</small></span>
+    </a>
+    <button class="btn btn-secondary btn-sm" onclick="logout()">Uitloggen</button>
+  </header>
+
+  <main>
+    <div class="page-title" id="meetingTitle">Vergadering</div>
+    <div class="page-sub">Zet je microfoon aan en start de opname. Het transcript verschijnt automatisch per fragment.</div>
+
+    <div class="notice">
+      Audio wordt in fragmenten naar OpenAI gestuurd om te transcriberen. Zorg dat dit past binnen het
+      privacybeleid van Bravis voordat je vertrouwelijke onderwerpen bespreekt.
+    </div>
+
+    <div class="card recorder-panel">
+      <div class="record-indicator" id="indicator">🎙</div>
+      <div class="timer" id="timer">00:00</div>
+      <div class="rec-status" id="recStatus">Nog niet gestart</div>
+      <div class="rec-controls">
+        <button class="btn btn-primary" id="startBtn">Start opname</button>
+        <button class="btn btn-danger" id="stopBtn" disabled>Stop opname</button>
+      </div>
+
+      <div class="transcript-live" id="transcriptWrap" style="display:none;">
+        <h3>Live transcript</h3>
+        <div id="segments"></div>
+      </div>
+    </div>
+
+    <div style="margin-top:1.5rem; text-align:center;">
+      <a href="#" class="btn btn-secondary" id="viewMeetingLink" style="display:none;">Naar volledig transcript →</a>
+    </div>
+  </main>
+</div>
+
+<script src="js/auth.js"></script>
+<script src="js/recorder.js"></script>
+</body>
+</html>

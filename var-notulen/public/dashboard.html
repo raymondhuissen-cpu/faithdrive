@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VAR Notulen — Overzicht</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="app-shell">
+  <header class="app-header">
+    <a href="dashboard.html" class="brand">
+      <span class="brand-badge">🎙</span>
+      <span>VAR Notulen<small>Bravis ziekenhuis</small></span>
+    </a>
+    <button class="btn btn-secondary btn-sm" onclick="logout()">Uitloggen</button>
+  </header>
+
+  <main>
+    <div class="list-header">
+      <div>
+        <div class="page-title">Vergaderingen</div>
+        <div class="muted">Opgenomen en getranscribeerde VAR-vergaderingen</div>
+      </div>
+      <button class="btn btn-primary" id="newMeetingBtn">+ Nieuwe opname</button>
+    </div>
+
+    <div id="list" class="meeting-list"></div>
+  </main>
+</div>
+
+<script src="js/auth.js"></script>
+<script>
+  const list = document.getElementById('list');
+
+  function formatDate(iso) {
+    return new Date(iso).toLocaleString('nl-NL', { dateStyle: 'medium', timeStyle: 'short' });
+  }
+
+  async function loadMeetings() {
+    const res = await fetch('/api/meetings');
+    if (res.status === 401) return window.location.replace('login.html');
+    const meetings = await res.json();
+
+    if (meetings.length === 0) {
+      list.innerHTML = '<div class="card empty-state">Nog geen vergaderingen opgenomen.<br>Klik op “+ Nieuwe opname” om te beginnen.</div>';
+      return;
+    }
+
+    list.innerHTML = meetings.map((m) => `
+      <a class="meeting-item" href="meeting.html?id=${encodeURIComponent(m.id)}">
+        <div>
+          <div class="meeting-item-title">${escapeHtml(m.title)}</div>
+          <div class="meeting-item-meta">${formatDate(m.createdAt)} · ${m.segmentCount} fragment${m.segmentCount === 1 ? '' : 'en'}</div>
+        </div>
+        <span class="status-pill ${m.status === 'recording' ? 'status-recording' : 'status-done'}">
+          ${m.status === 'recording' ? 'Loopt nog' : 'Afgerond'}
+        </span>
+      </a>
+    `).join('');
+  }
+
+  function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  document.getElementById('newMeetingBtn').addEventListener('click', async () => {
+    const title = prompt('Titel van deze vergadering (bijv. "VAR overleg 18 juli 2026")', 'VAR overleg ' + new Date().toLocaleDateString('nl-NL'));
+    if (title === null) return;
+    const res = await fetch('/api/meetings', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ title }),
+    });
+    const meeting = await res.json();
+    window.location.href = `recorder.html?id=${encodeURIComponent(meeting.id)}`;
+  });
+
+  (async () => {
+    if (await requireSession()) loadMeetings();
+  })();
+</script>
+</body>
+</html>

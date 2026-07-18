@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VAR Notulen — Transcript</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="app-shell">
+  <header class="app-header">
+    <a href="dashboard.html" class="brand">
+      <span class="brand-badge">🎙</span>
+      <span>VAR Notulen<small>Bravis ziekenhuis</small></span>
+    </a>
+    <button class="btn btn-secondary btn-sm" onclick="logout()">Uitloggen</button>
+  </header>
+
+  <main>
+    <a href="dashboard.html" class="muted" style="display:inline-block; margin-bottom:1rem;">← Terug naar overzicht</a>
+
+    <div class="card">
+      <div class="detail-header">
+        <input type="text" id="titleInput" class="title-input" placeholder="Titel van de vergadering">
+        <button class="btn btn-danger btn-sm" id="deleteBtn">Verwijderen</button>
+      </div>
+      <div class="muted" id="metaLine" style="margin-bottom:1.25rem;"></div>
+
+      <div class="export-row">
+        <a class="btn btn-secondary btn-sm" id="exportDocx" href="#">⬇ Word (.docx)</a>
+        <a class="btn btn-secondary btn-sm" id="exportTxt" href="#">⬇ Tekst (.txt)</a>
+      </div>
+
+      <label for="transcriptEditor">Transcript (bewerkbaar)</label>
+      <textarea id="transcriptEditor" class="transcript-editor" placeholder="Nog geen transcript…"></textarea>
+
+      <div class="save-row">
+        <button class="btn btn-primary btn-sm" id="saveBtn">Wijzigingen opslaan</button>
+        <span class="save-hint" id="saveHint"></span>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="js/auth.js"></script>
+<script src="js/meeting.js"></script>
+</body>
+</html>
