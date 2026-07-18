@@ -72,6 +72,40 @@ npm start
 
 Open daarna `http://localhost:3000` in de browser.
 
+### Windows: zonder command-line
+
+Niet handig met de opdrachtprompt? In `var-notulen/server` staan drie bestanden om te
+dubbelklikken in plaats van te typen:
+
+1. **`installeren.bat`** — installeert de app en maakt `.env` aan (opent Kladblok zodat
+   je `VAR_APP_PASSWORD` en `SESSION_SECRET` kunt invullen)
+2. **`starten.bat`** — start de app (laat dit venster open staan tijdens gebruik)
+3. **`tunnel-starten.bat`** — start een Cloudflare Tunnel zodat de app ook buiten je
+   eigen wifi bereikbaar is (bijv. vanaf een iPad); vereist dat `cloudflared` al is
+   geïnstalleerd, zie "Toegang vanaf een iPad" hieronder
+
+## Toegang vanaf een iPad (of andere telefoon/tablet)
+
+De browser staat microfoontoegang alleen toe via een beveiligde `https://`-verbinding
+(behalve op `localhost` zelf). Om de app op je eigen computer te laten draaien én
+bereikbaar te maken voor een iPad, is een gratis Cloudflare Tunnel de simpelste route:
+
+1. Installeer `cloudflared` (eenmalig): open een Opdrachtprompt/terminal en typ
+   `winget install --id Cloudflare.cloudflared` (Windows), of zoek naar het project
+   `cloudflare/cloudflared` op GitHub voor andere platformen.
+2. Start de app zoals hierboven beschreven (`npm start` of `starten.bat`).
+3. Start in een **tweede** terminalvenster de tunnel: `cloudflared tunnel --url
+   http://localhost:3000` (of dubbelklik `tunnel-starten.bat` op Windows).
+4. Er verschijnt een adres zoals `https://iets-random.trycloudflare.com` — open dat op
+   de iPad in Safari, log in, en tik op het deel-icoon → "Zet op beginscherm" voor een
+   app-icoontje.
+
+Let op: dit adres is openbaar bereikbaar voor iedereen die de link kent (al blijft de
+app zelf wachtwoord-beveiligd), en verandert elke keer dat je de tunnel herstart. Beide
+vensters (app + tunnel) moeten open blijven staan zolang je de app gebruikt. Voor een
+stabieler adres en een striktere, alleen-eigen-apparaten-toegang is
+[Tailscale](https://tailscale.com) een alternatief, met iets meer opzetwerk.
+
 ## Hosten (productie)
 
 Deze app heeft — in tegenstelling tot de statische AmaanCover-pagina's in de rest van
