@@ -1,4 +1,6 @@
 import Parser from "rss-parser";
+import { readFileSync } from "fs";
+import { resolve } from "path";
 
 export type NewsItem = {
   id: string;
@@ -149,15 +151,28 @@ function stripHtml(html: string): string {
   return html.replace(/<[^>]*>/g, "").trim().slice(0, 300);
 }
 
+function loadCachedFile(): NewsItem[] {
+  try {
+    const raw = readFileSync(resolve(process.cwd(), "data/news-cache.json"), "utf-8");
+    const parsed = JSON.parse(raw) as { items: NewsItem[] };
+    return parsed.items ?? [];
+  } catch {
+    return [];
+  }
+}
+
 export async function getNewsItems(): Promise<NewsItem[]> {
   if (_cache && Date.now() - _cache.fetchedAt < CACHE_TTL) {
     return _cache.items;
   }
 
+  // Probeer live feeds; valt terug op dagelijks bijgewerkte JSON-cache
   const results = await Promise.allSettled(FEEDS.map(fetchFeed));
-  const items = results
-    .flatMap((r) => (r.status === "fulfilled" ? r.value : []))
-    .sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime());
+  const live = results.flatMap((r) => (r.status === "fulfilled" ? r.value : []));
+
+  const items = (live.length > 0 ? live : loadCachedFile()).sort(
+    (a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime()
+  );
 
   _cache = { items, fetchedAt: Date.now() };
   return items;
