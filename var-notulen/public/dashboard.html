@@ -25,29 +25,45 @@
       <button class="btn btn-primary" id="newMeetingBtn">+ Nieuwe opname</button>
     </div>
 
-    <div id="list" class="meeting-list"></div>
+    <div class="search-row" id="searchRow" style="display:none;">
+      <div class="search-input-wrap">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="searchInput" placeholder="Zoeken op titel…">
+      </div>
+    </div>
+
+    <div id="list"></div>
   </main>
 </div>
 
+<script src="js/ui.js"></script>
 <script src="js/auth.js"></script>
 <script>
   const list = document.getElementById('list');
+  const searchRow = document.getElementById('searchRow');
+  const searchInput = document.getElementById('searchInput');
+  let allMeetings = [];
 
   function formatDate(iso) {
     return new Date(iso).toLocaleString('nl-NL', { dateStyle: 'medium', timeStyle: 'short' });
   }
 
-  async function loadMeetings() {
-    const res = await fetch('/api/meetings');
-    if (res.status === 401) return window.location.replace('login.html');
-    const meetings = await res.json();
+  function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
 
-    if (meetings.length === 0) {
+  function renderList(meetings) {
+    if (allMeetings.length === 0) {
       list.innerHTML = '<div class="card empty-state">Nog geen vergaderingen opgenomen.<br>Klik op “+ Nieuwe opname” om te beginnen.</div>';
       return;
     }
-
-    list.innerHTML = meetings.map((m) => `
+    if (meetings.length === 0) {
+      list.innerHTML = '<div class="card empty-state">Geen vergaderingen gevonden voor deze zoekopdracht.</div>';
+      return;
+    }
+    list.innerHTML = `<div class="meeting-list">${meetings.map((m) => `
       <a class="meeting-item" href="meeting.html?id=${encodeURIComponent(m.id)}">
         <div>
           <div class="meeting-item-title">${escapeHtml(m.title)}</div>
@@ -57,25 +73,51 @@
           ${m.status === 'recording' ? 'Loopt nog' : 'Afgerond'}
         </span>
       </a>
-    `).join('');
+    `).join('')}</div>`;
   }
 
-  function escapeHtml(str) {
-    const div = document.createElement('div');
-    div.textContent = str;
-    return div.innerHTML;
+  function applySearch() {
+    const q = searchInput.value.trim().toLowerCase();
+    const filtered = q ? allMeetings.filter((m) => m.title.toLowerCase().includes(q)) : allMeetings;
+    renderList(filtered);
   }
+
+  async function loadMeetings() {
+    list.innerHTML = '<div class="loading-row"><div class="spinner"></div></div>';
+    const res = await fetch('/api/meetings');
+    if (res.status === 401) return window.location.replace('login.html');
+    allMeetings = await res.json();
+    searchRow.style.display = allMeetings.length > 3 ? 'block' : 'none';
+    applySearch();
+  }
+
+  searchInput.addEventListener('input', applySearch);
 
   document.getElementById('newMeetingBtn').addEventListener('click', async () => {
-    const title = prompt('Titel van deze vergadering (bijv. "VAR overleg 18 juli 2026")', 'VAR overleg ' + new Date().toLocaleDateString('nl-NL'));
-    if (title === null) return;
-    const res = await fetch('/api/meetings', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ title }),
+    const defaultTitle = 'VAR overleg ' + new Date().toLocaleDateString('nl-NL');
+    const title = await showPromptDialog({
+      title: 'Nieuwe vergadering',
+      label: 'Titel van deze vergadering',
+      defaultValue: defaultTitle,
+      confirmLabel: 'Start opname →',
     });
-    const meeting = await res.json();
-    window.location.href = `recorder.html?id=${encodeURIComponent(meeting.id)}`;
+    if (title === null) return;
+
+    const btn = document.getElementById('newMeetingBtn');
+    btn.disabled = true;
+    try {
+      const res = await fetch('/api/meetings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title }),
+      });
+      if (!res.ok) throw new Error('Serverfout');
+      const meeting = await res.json();
+      window.location.href = `recorder.html?id=${encodeURIComponent(meeting.id)}`;
+    } catch {
+      showToast('Kon geen nieuwe vergadering aanmaken. Probeer het opnieuw.', 'error');
+      btn.disabled = false;
+    }
   });
 
   (async () => {

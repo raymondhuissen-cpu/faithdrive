@@ -7,21 +7,32 @@ const indicator = document.getElementById('indicator');
 const timerEl = document.getElementById('timer');
 const recStatus = document.getElementById('recStatus');
 const startBtn = document.getElementById('startBtn');
+const pauseBtn = document.getElementById('pauseBtn');
 const stopBtn = document.getElementById('stopBtn');
 const transcriptWrap = document.getElementById('transcriptWrap');
 const segmentsEl = document.getElementById('segments');
 const viewMeetingLink = document.getElementById('viewMeetingLink');
 const meetingTitleEl = document.getElementById('meetingTitle');
+const engineBanner = document.getElementById('engineBanner');
+const micMeterWrap = document.getElementById('micMeterWrap');
+const micMeterFill = document.getElementById('micMeterFill');
 
 let stream = null;
 let mediaRecorder = null;
 let chunks = [];
 let recording = false;
+let paused = false;
 let stopRequested = false;
 let recordStartTime = null;
+let pauseStartedAt = null;
 let timerInterval = null;
 let segmentTimeout = null;
 let pendingUploads = 0;
+
+let audioCtx = null;
+let analyser = null;
+let meterData = null;
+let meterRAF = null;
 
 function pickMimeType() {
   const candidates = ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4'];
@@ -42,6 +53,83 @@ function formatElapsed(ms) {
 
 function tickTimer() {
   timerEl.textContent = formatElapsed(Date.now() - recordStartTime);
+}
+
+// ── Engine-status ──────────────────────────────────
+async function pollEngineStatus() {
+  try {
+    const res = await fetch('/api/engine-status');
+    if (res.status === 401) return window.location.replace('login.html');
+    const status = await res.json();
+    renderEngineBanner(status);
+    if (status.engine === 'local' && !status.ready) {
+      setTimeout(pollEngineStatus, 5000);
+    }
+  } catch {
+    // Stil falen; de banner is informatief, geen blokkerende functionaliteit.
+  }
+}
+
+function renderEngineBanner(status) {
+  engineBanner.style.display = 'flex';
+  if (status.engine === 'openai') {
+    engineBanner.className = 'engine-banner cloud';
+    engineBanner.innerHTML = `<span class="dot"></span> Transcriptie via OpenAI (cloud).`;
+    return;
+  }
+  if (status.ready) {
+    engineBanner.className = 'engine-banner ready';
+    engineBanner.innerHTML = `<span class="dot"></span> Lokale transcriptie is klaar (model: ${status.model}).`;
+  } else {
+    engineBanner.className = 'engine-banner warming';
+    engineBanner.innerHTML =
+      `<span class="dot"></span> Lokaal transcriptiemodel wordt nog voorbereid (eenmalig, kan enkele ` +
+      `minuten duren). Je kunt gewoon starten met opnemen — het eerste fragment wordt iets later verwerkt.`;
+  }
+}
+
+// ── Microfoonmeter ──────────────────────────────────
+function startMicMeter(sourceStream) {
+  try {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    analyser = audioCtx.createAnalyser();
+    analyser.fftSize = 512;
+    const source = audioCtx.createMediaStreamSource(sourceStream);
+    source.connect(analyser);
+    meterData = new Uint8Array(analyser.frequencyBinCount);
+    micMeterWrap.style.display = 'block';
+    updateMicMeter();
+  } catch {
+    micMeterWrap.style.display = 'none';
+  }
+}
+
+function updateMicMeter() {
+  if (!recording) return;
+  if (paused || !analyser) {
+    micMeterFill.style.width = '0%';
+    meterRAF = requestAnimationFrame(updateMicMeter);
+    return;
+  }
+  analyser.getByteTimeDomainData(meterData);
+  let sumSquares = 0;
+  for (let i = 0; i < meterData.length; i++) {
+    const v = (meterData[i] - 128) / 128;
+    sumSquares += v * v;
+  }
+  const rms = Math.sqrt(sumSquares / meterData.length);
+  const pct = Math.min(100, rms * 450);
+  micMeterFill.style.width = pct + '%';
+  micMeterFill.classList.toggle('silent', pct < 3);
+  meterRAF = requestAnimationFrame(updateMicMeter);
+}
+
+function stopMicMeter() {
+  if (meterRAF) cancelAnimationFrame(meterRAF);
+  if (audioCtx) audioCtx.close().catch(() => {});
+  audioCtx = null;
+  analyser = null;
+  micMeterWrap.style.display = 'none';
 }
 
 async function loadMeetingTitle() {
@@ -90,6 +178,7 @@ async function uploadSegment(blob, mimeType) {
     resolveSegment(placeholderId, data.segment.text);
   } catch (err) {
     resolveSegment(placeholderId, '⚠ Transcriptie van dit fragment is mislukt.');
+    showToast('Transcriptie van een fragment is mislukt. De opname loopt gewoon door.', 'error');
   } finally {
     pendingUploads -= 1;
     updateStatus();
@@ -97,7 +186,9 @@ async function uploadSegment(blob, mimeType) {
 }
 
 function updateStatus() {
-  if (recording) {
+  if (paused) {
+    recStatus.textContent = 'Gepauzeerd';
+  } else if (recording) {
     recStatus.textContent = pendingUploads > 0
       ? `Opname loopt · ${pendingUploads} fragment${pendingUploads === 1 ? '' : 'en'} worden verwerkt`
       : 'Opname loopt';
@@ -138,32 +229,64 @@ async function startRecording() {
   try {
     stream = await navigator.mediaDevices.getUserMedia({ audio: true });
   } catch (err) {
-    alert('Kon geen toegang krijgen tot de microfoon: ' + err.message);
+    showToast('Kon geen toegang krijgen tot de microfoon: ' + err.message, 'error', 6000);
     return;
   }
 
   recording = true;
+  paused = false;
   stopRequested = false;
   recordStartTime = Date.now();
   timerInterval = setInterval(tickTimer, 1000);
   indicator.classList.add('live');
   startBtn.disabled = true;
+  startBtn.style.display = 'none';
+  pauseBtn.style.display = 'inline-flex';
+  pauseBtn.disabled = false;
   stopBtn.disabled = false;
   updateStatus();
+  startMicMeter(stream);
 
   startSegmentRecorder();
 }
 
+function togglePause() {
+  if (!paused) {
+    paused = true;
+    pauseStartedAt = Date.now();
+    clearTimeout(segmentTimeout);
+    clearInterval(timerInterval);
+    if (mediaRecorder && mediaRecorder.state === 'recording') mediaRecorder.pause();
+    indicator.classList.remove('live');
+    pauseBtn.textContent = 'Hervat';
+    updateStatus();
+  } else {
+    paused = false;
+    recordStartTime += Date.now() - pauseStartedAt; // schuif starttijd op zodat de teller klopt
+    timerInterval = setInterval(tickTimer, 1000);
+    if (mediaRecorder && mediaRecorder.state === 'paused') mediaRecorder.resume();
+    segmentTimeout = setTimeout(() => {
+      if (mediaRecorder && mediaRecorder.state === 'recording') mediaRecorder.stop();
+    }, SEGMENT_MS);
+    indicator.classList.add('live');
+    pauseBtn.textContent = 'Pauzeer';
+    updateStatus();
+  }
+}
+
 function stopRecording() {
   stopRequested = true;
+  paused = false;
   stopBtn.disabled = true;
+  pauseBtn.disabled = true;
   recording = false;
   clearInterval(timerInterval);
   clearTimeout(segmentTimeout);
   indicator.classList.remove('live');
+  stopMicMeter();
   updateStatus();
 
-  if (mediaRecorder && mediaRecorder.state === 'recording') {
+  if (mediaRecorder && (mediaRecorder.state === 'recording' || mediaRecorder.state === 'paused')) {
     mediaRecorder.stop();
   } else {
     finishRecording();
@@ -185,21 +308,31 @@ async function finishRecording() {
     body: JSON.stringify({ status: 'done' }),
   });
 
-  viewMeetingLink.style.display = 'inline-flex';
-  waitForPendingThenRedirect();
+  waitForPendingThenShowLink();
 }
 
-function waitForPendingThenRedirect() {
+function waitForPendingThenShowLink() {
+  const reveal = () => {
+    recStatus.textContent = 'Opname afgerond — transcript is klaar';
+    viewMeetingLink.style.display = 'inline-flex';
+  };
+
+  if (pendingUploads === 0) {
+    reveal();
+    return;
+  }
+
   const check = setInterval(() => {
     updateStatus();
     if (pendingUploads === 0) {
       clearInterval(check);
-      recStatus.textContent = 'Opname afgerond — transcript is klaar';
+      reveal();
     }
   }, 500);
 }
 
 startBtn.addEventListener('click', startRecording);
+pauseBtn.addEventListener('click', togglePause);
 stopBtn.addEventListener('click', stopRecording);
 
 (async () => {
@@ -207,7 +340,10 @@ stopBtn.addEventListener('click', stopRecording);
     document.body.innerHTML = '<p style="padding:2rem;">Geen vergadering-ID opgegeven.</p>';
     return;
   }
-  if (await requireSession()) loadMeetingTitle();
+  if (await requireSession()) {
+    loadMeetingTitle();
+    pollEngineStatus();
+  }
 })();
 
 window.addEventListener('beforeunload', (e) => {

@@ -20,6 +20,8 @@
     <div class="page-title" id="meetingTitle">Vergadering</div>
     <div class="page-sub">Zet je microfoon aan en start de opname. Het transcript verschijnt automatisch per fragment.</div>
 
+    <div id="engineBanner" class="engine-banner" style="display:none;"></div>
+
     <div class="notice">
       Audio wordt in fragmenten getranscribeerd door de server. Standaard gebeurt dit lokaal op de
       server zelf (geen data naar derden); als deze installatie is ingesteld op de OpenAI-engine
@@ -31,8 +33,14 @@
       <div class="record-indicator" id="indicator">🎙</div>
       <div class="timer" id="timer">00:00</div>
       <div class="rec-status" id="recStatus">Nog niet gestart</div>
+
+      <div class="mic-meter" id="micMeterWrap" style="display:none;">
+        <div class="mic-meter-fill silent" id="micMeterFill"></div>
+      </div>
+
       <div class="rec-controls">
         <button class="btn btn-primary" id="startBtn">Start opname</button>
+        <button class="btn btn-secondary" id="pauseBtn" disabled style="display:none;">Pauzeer</button>
         <button class="btn btn-danger" id="stopBtn" disabled>Stop opname</button>
       </div>
 
@@ -48,6 +56,7 @@
   </main>
 </div>
 
+<script src="js/ui.js"></script>
 <script src="js/auth.js"></script>
 <script src="js/recorder.js"></script>
 </body>

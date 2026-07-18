@@ -7,7 +7,12 @@ const multer = require('multer');
 
 const store = require('./lib/store');
 const { transcribeAudio } = require('./lib/openai');
-const { transcribeAudioLocally, checkFfmpegAvailable, MODEL_NAME } = require('./lib/localWhisper');
+const {
+  transcribeAudioLocally,
+  checkFfmpegAvailable,
+  getLocalEngineStatus,
+  MODEL_NAME,
+} = require('./lib/localWhisper');
 const { buildMeetingDocx } = require('./lib/docx');
 
 const TRANSCRIPTION_ENGINE = (process.env.TRANSCRIPTION_ENGINE || 'local').toLowerCase();
@@ -80,6 +85,13 @@ app.post('/api/logout', (req, res) => {
 
 app.get('/api/session', (req, res) => {
   res.json({ authenticated: Boolean(req.session && req.session.authenticated) });
+});
+
+app.get('/api/engine-status', requireAuth, (req, res) => {
+  if (TRANSCRIPTION_ENGINE === 'openai') {
+    return res.json({ engine: 'openai', ready: true });
+  }
+  res.json(getLocalEngineStatus());
 });
 
 // ── Vergaderingen ────────────────────────────────────

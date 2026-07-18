@@ -4,10 +4,37 @@ const fs = require('fs');
 const crypto = require('crypto');
 const { execSync } = require('child_process');
 const { nodewhisper } = require('nodejs-whisper');
+const { WHISPER_CPP_PATH, MODEL_OBJECT } = require('nodejs-whisper/dist/constants');
 
 const MODEL_NAME = process.env.WHISPER_LOCAL_MODEL || 'small';
 const USE_CUDA = process.env.WHISPER_USE_CUDA === 'true';
 const MODEL_ROOT = path.join(__dirname, '..', 'data', 'models');
+
+function isBinaryBuilt() {
+  const execName = process.platform === 'win32' ? 'whisper-cli.exe' : 'whisper-cli';
+  const candidates = [
+    path.join(WHISPER_CPP_PATH, 'build', 'bin', execName),
+    path.join(WHISPER_CPP_PATH, 'build', 'bin', 'Release', execName),
+  ];
+  return candidates.some((p) => fs.existsSync(p));
+}
+
+function isModelDownloaded() {
+  const modelFile = MODEL_OBJECT[MODEL_NAME];
+  return Boolean(modelFile) && fs.existsSync(path.join(MODEL_ROOT, modelFile));
+}
+
+function getLocalEngineStatus() {
+  const binaryBuilt = isBinaryBuilt();
+  const modelDownloaded = isModelDownloaded();
+  return {
+    engine: 'local',
+    model: MODEL_NAME,
+    binaryBuilt,
+    modelDownloaded,
+    ready: binaryBuilt && modelDownloaded,
+  };
+}
 
 const TIMESTAMP_LINE = /^\[[^\]]*\]\s*/;
 
@@ -71,4 +98,4 @@ function transcribeAudioLocally(buffer, mimeType) {
   return result;
 }
 
-module.exports = { transcribeAudioLocally, checkFfmpegAvailable, MODEL_NAME, MODEL_ROOT };
+module.exports = { transcribeAudioLocally, checkFfmpegAvailable, getLocalEngineStatus, MODEL_NAME, MODEL_ROOT };

@@ -122,6 +122,11 @@ informatiebeveiligingsbeleid (bijv. NEN 7510). Bespreek in ieder geval:
 - Transcript achteraf bewerken en opslaan
 - Exporteren als .docx (Word) of .txt
 - Vergadering verwijderen
+- Microfoon-niveaumeter tijdens opname (zichtbare bevestiging dat er geluid wordt opgepikt)
+- Pauzeren/hervatten tijdens een opname
+- Statusbanner die laat zien of de lokale transcriptie-engine klaar is, of nog wordt voorbereid
+- Zoeken in de vergaderingenlijst, automatisch opslaan van transcriptbewerkingen
+- Nette in-app meldingen/bevestigingen in plaats van browser-popups
 
 ## Mogelijke vervolgstappen (niet in v1)
 
