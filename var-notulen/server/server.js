@@ -33,8 +33,9 @@ if (missing.length) {
 if (TRANSCRIPTION_ENGINE === 'local' && !checkFfmpegAvailable()) {
   console.warn(
     '[Waarschuwing] ffmpeg is niet gevonden. De lokale transcriptie-engine heeft ffmpeg nodig ' +
-      'om opgenomen audio te verwerken. Installeer het met "sudo apt install ffmpeg" (Linux) of ' +
-      '"brew install ffmpeg" (macOS) — anders mislukt transcriptie van elk fragment.'
+      'om opgenomen audio te verwerken — anders mislukt transcriptie van elk fragment. Installeer ' +
+      'het met "winget install ffmpeg" (Windows), "sudo apt install ffmpeg" (Linux) of ' +
+      '"brew install ffmpeg" (macOS), en start de server daarna opnieuw.'
   );
 }
 

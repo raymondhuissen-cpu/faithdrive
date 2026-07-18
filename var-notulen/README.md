@@ -35,8 +35,9 @@ er dan helemaal geen data het ziekenhuisnetwerk verlaat.
 - Een C/C++ build-toolchain: op Linux `sudo apt install build-essential cmake`, op macOS
   Xcode Command Line Tools, op Windows MSYS2/MinGW-w64 (zie de
   [nodejs-whisper documentatie](https://www.npmjs.com/package/nodejs-whisper)).
-- `ffmpeg` op het systeem (`sudo apt install ffmpeg` / `brew install ffmpeg`), om de
-  opgenomen audio naar het juiste formaat te converteren.
+- `ffmpeg` op het systeem (`winget install ffmpeg` op Windows, `sudo apt install ffmpeg`
+  op Linux, `brew install ffmpeg` op macOS), om de opgenomen audio naar het juiste
+  formaat te converteren.
 - Genoeg schijfruimte en RAM voor het model: `small` (standaard) is ~500 MB en werkt
   prima op een gewone server-CPU; `medium` is nauwkeuriger maar trager en zwaarder.
 

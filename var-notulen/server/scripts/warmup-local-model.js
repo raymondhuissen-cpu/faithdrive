@@ -40,7 +40,8 @@ async function main() {
     console.warn(
       '[Warmup] Waarschuwing: ffmpeg is niet gevonden op dit systeem. ' +
         'De lokale transcriptie-engine heeft ffmpeg nodig om opgenomen audio om te zetten. ' +
-        'Installeer het bijvoorbeeld met "sudo apt install ffmpeg" (Linux) of "brew install ffmpeg" (macOS).'
+        'Installeer het met "winget install ffmpeg" (Windows), "sudo apt install ffmpeg" (Linux) ' +
+        'of "brew install ffmpeg" (macOS).'
     );
   }
 
