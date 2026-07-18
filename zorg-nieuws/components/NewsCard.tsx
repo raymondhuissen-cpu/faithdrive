@@ -4,13 +4,11 @@ import { NewsItem } from "@/lib/rss";
 
 const CATEGORY_LABELS: Record<NewsItem["category"], string> = {
   landelijk: "Landelijk",
-  regionaal: "Regionaal",
   ziekenhuis: "Ziekenhuis",
 };
 
 const CATEGORY_COLORS: Record<NewsItem["category"], string> = {
   landelijk: "bg-blue-100 text-blue-800",
-  regionaal: "bg-green-100 text-green-800",
   ziekenhuis: "bg-purple-100 text-purple-800",
 };
 

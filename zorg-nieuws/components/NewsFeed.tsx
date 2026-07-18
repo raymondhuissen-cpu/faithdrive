@@ -8,8 +8,7 @@ type Category = "all" | NewsItem["category"];
 
 const CATEGORIES: { value: Category; label: string }[] = [
   { value: "all", label: "Alles" },
-  { value: "landelijk", label: "Landelijk" },
-  { value: "regionaal", label: "Regionaal" },
+  { value: "landelijk", label: "Landelijk nieuws" },
   { value: "ziekenhuis", label: "Ziekenhuizen" },
 ];
 

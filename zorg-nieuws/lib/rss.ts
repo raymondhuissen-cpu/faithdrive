@@ -7,7 +7,7 @@ export type NewsItem = {
   pubDate: string;
   summary: string;
   source: string;
-  category: "landelijk" | "regionaal" | "ziekenhuis";
+  category: "landelijk" | "ziekenhuis";
   image?: string;
 };
 
@@ -17,8 +17,9 @@ type FeedConfig = {
   category: NewsItem["category"];
 };
 
+
 const FEEDS: FeedConfig[] = [
-  // Landelijk
+  // Landelijk nieuws & vakbladen
   {
     url: "https://feeds.nos.nl/nosnieuwsgezondheid",
     source: "NOS Gezondheid",
@@ -34,21 +35,30 @@ const FEEDS: FeedConfig[] = [
     source: "Skipr",
     category: "landelijk",
   },
-  // Regionaal
   {
-    url: "https://www.omroepgelderland.nl/nieuws/gezondheid.rss",
-    source: "Omroep Gelderland",
-    category: "regionaal",
+    url: "https://www.medischcontact.nl/rss/nieuws.xml",
+    source: "Medisch Contact",
+    category: "landelijk",
   },
   {
-    url: "https://www.rtvnoord.nl/rss/gezondheid",
-    source: "RTV Noord",
-    category: "regionaal",
+    url: "https://www.nrc.nl/rss/gezondheid",
+    source: "NRC Gezondheid",
+    category: "landelijk",
   },
-  // Ziekenhuizen
   {
-    url: "https://www.umcg.nl/NL/UMCG/nieuws-en-pers/Pages/nieuwsoverzicht.aspx",
-    source: "UMCG",
+    url: "https://www.rijksoverheid.nl/actueel/nieuws.rss?onderwerp=zorg",
+    source: "Rijksoverheid VWS",
+    category: "landelijk",
+  },
+  {
+    url: "https://www.volkskrant.nl/nieuws-achtergrond/gezondheid/rss.xml",
+    source: "Volkskrant Gezondheid",
+    category: "landelijk",
+  },
+  // UMC's
+  {
+    url: "https://www.amsterdamumc.nl/rss/nieuws",
+    source: "Amsterdam UMC",
     category: "ziekenhuis",
   },
   {
@@ -67,8 +77,34 @@ const FEEDS: FeedConfig[] = [
     category: "ziekenhuis",
   },
   {
-    url: "https://www.amsterdamumc.nl/rss/nieuws",
-    source: "Amsterdam UMC",
+    url: "https://www.umcg.nl/NL/UMCG/nieuws-en-pers/Pages/nieuwsoverzicht.aspx",
+    source: "UMCG",
+    category: "ziekenhuis",
+  },
+  {
+    url: "https://www.umcutrecht.nl/rss/nieuws",
+    source: "UMC Utrecht",
+    category: "ziekenhuis",
+  },
+  // Topklinische ziekenhuizen
+  {
+    url: "https://www.catharina-ziekenhuis.nl/nieuws/rss",
+    source: "Catharina Ziekenhuis",
+    category: "ziekenhuis",
+  },
+  {
+    url: "https://www.isala.nl/rss/nieuws",
+    source: "Isala",
+    category: "ziekenhuis",
+  },
+  {
+    url: "https://www.st-antonius.nl/rss/nieuws",
+    source: "St. Antonius",
+    category: "ziekenhuis",
+  },
+  {
+    url: "https://www.mst.nl/rss/nieuws",
+    source: "MST",
     category: "ziekenhuis",
   },
 ];
