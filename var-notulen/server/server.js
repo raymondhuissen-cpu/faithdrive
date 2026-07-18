@@ -7,14 +7,37 @@ const multer = require('multer');
 
 const store = require('./lib/store');
 const { transcribeAudio } = require('./lib/openai');
+const { transcribeAudioLocally, checkFfmpegAvailable, MODEL_NAME } = require('./lib/localWhisper');
 const { buildMeetingDocx } = require('./lib/docx');
 
-const REQUIRED_ENV = ['OPENAI_API_KEY', 'VAR_APP_PASSWORD', 'SESSION_SECRET'];
+const TRANSCRIPTION_ENGINE = (process.env.TRANSCRIPTION_ENGINE || 'local').toLowerCase();
+if (!['local', 'openai'].includes(TRANSCRIPTION_ENGINE)) {
+  console.error(`Ongeldige TRANSCRIPTION_ENGINE: "${TRANSCRIPTION_ENGINE}". Gebruik "local" of "openai".`);
+  process.exit(1);
+}
+
+const REQUIRED_ENV = ['VAR_APP_PASSWORD', 'SESSION_SECRET'];
+if (TRANSCRIPTION_ENGINE === 'openai') REQUIRED_ENV.push('OPENAI_API_KEY');
 const missing = REQUIRED_ENV.filter((k) => !process.env[k]);
 if (missing.length) {
   console.error(`Ontbrekende environment variabelen: ${missing.join(', ')}`);
   console.error('Kopieer server/.env.example naar server/.env en vul de waarden in.');
   process.exit(1);
+}
+
+if (TRANSCRIPTION_ENGINE === 'local' && !checkFfmpegAvailable()) {
+  console.warn(
+    '[Waarschuwing] ffmpeg is niet gevonden. De lokale transcriptie-engine heeft ffmpeg nodig ' +
+      'om opgenomen audio te verwerken. Installeer het met "sudo apt install ffmpeg" (Linux) of ' +
+      '"brew install ffmpeg" (macOS) — anders mislukt transcriptie van elk fragment.'
+  );
+}
+
+async function transcribe(buffer, filename, mimeType) {
+  if (TRANSCRIPTION_ENGINE === 'openai') {
+    return transcribeAudio(buffer, filename, mimeType);
+  }
+  return transcribeAudioLocally(buffer, mimeType);
 }
 
 const app = express();
@@ -103,7 +126,7 @@ app.post('/api/meetings/:id/segments', requireAuth, upload.single('audio'), asyn
   if (!req.file) return res.status(400).json({ error: 'Geen audiobestand ontvangen' });
 
   try {
-    const text = await transcribeAudio(req.file.buffer, req.file.originalname, req.file.mimetype);
+    const text = await transcribe(req.file.buffer, req.file.originalname, req.file.mimetype);
     const segment = {
       index: meeting.segments.length,
       text,
@@ -157,4 +180,12 @@ app.get('*', (req, res) => {
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`VAR-notulen server draait op http://localhost:${PORT}`);
+  console.log(
+    TRANSCRIPTION_ENGINE === 'local'
+      ? `Transcriptie-engine: lokaal (whisper.cpp, model "${MODEL_NAME}") — er gaat geen audio naar derden.`
+      : 'Transcriptie-engine: OpenAI Whisper API (cloud).'
+  );
+  if (TRANSCRIPTION_ENGINE === 'local') {
+    console.log('Tip: draai eenmalig "npm run warmup" zodat het model niet pas tijdens de eerste opname wordt gedownload.');
+  }
 });
